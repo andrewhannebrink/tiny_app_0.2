@@ -1,0 +1,10 @@
+body {    
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.screen {
+  width: 340px;
+  height: 568px;
+  overflow: scroll;
+}
