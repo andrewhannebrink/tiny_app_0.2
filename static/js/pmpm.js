@@ -1,9 +1,50 @@
 // pmpm.js - Photo-Mosaic Photo Module
 // Andrew Hannebrink 2015
 
-var pmpm = function () {
+// TODO implement spec
+var pmpm = function (spec) {
 
+  var that = {};
+  var libs = {};
   var testSz = 24;
+
+  var test = function() {
+        var canv = document.getElementById('canvas');
+        var canvCtx = canv.getContext('2d');
+        var tileX = testSz; 
+        var tileY = testSz; 
+        var scale = 1;
+        var skip = 5;
+        var lib = 'emoji';
+        var w = canvCtx.canvas.width;
+        var h = canvCtx.canvas.height;
+        //TODO take this out of loadSelect and give a button an even listener
+        var mosaicParams = { 
+          context: canvCtx,
+          w: w,
+          h: h,
+          scale: scale,
+          tileX: tileX,
+          tileY: tileY,
+          lib: lib,
+          skip: skip,
+          bg: 'random'
+        };
+        testSz -= 4;
+        makeMosaic(mosaicParams);
+  };
+
+  // private function for implementing filters
+  var randomRGB = function (filters) {
+    // TODO implement filters
+    var r, g, b;
+    if (typeof filters === 'undefined') {
+      r = Math.floor(Math.random()*256);
+      g = Math.floor(Math.random()*256);
+      b = Math.floor(Math.random()*256);
+    }
+    return [r, g, b];
+  };
 
   // private function for return avg rgb in a region
   var getAvgRGB = function (context, skip, x, y, w, h) {
@@ -32,8 +73,10 @@ var pmpm = function () {
     return avg; 
   };
 
+
+
   //private function for finding the distance (squared) between points in R3
-  var distance = function(a, b) {
+  var distance = function (a, b) {
     //TODO use exponent functions
     var d = Math.pow(a[0]-b[0], 2);
     d += Math.pow(a[1]-b[1], 2);
@@ -55,204 +98,182 @@ var pmpm = function () {
     xobj.send(null);  
   };
 
-  return {
-    libs: {},
-    loadLib: function (context, dir, w, h, iconSz, filters) {
-      var that = this;
-      var yPos = 0;
-      var xPos = 0;
-      var jsonPath = dir + '/' + dir + '.json';
-      loadJSON(jsonPath, function (res) {
-        var i, img, avg, imgPath, cropImgParams, cropColParams;
-        if (typeof res.length === 0 || res.length === undefined) {
-          throw 'could not read images from json file at ' + jsonPath;
-        }
-        // Add lib to active libs after loaded (switch complete to true)
-        that.libs[dir] = {
-          complete: false,
-          icons: [],
-          tot: res.length
-        };
-        i = 0;
-        while (yPos + iconSz < h) {
-          while (xPos + 2*iconSz < w) {
-            if (i >= res.length) {
-              yPos = h; 
-              break;
-            }
-            // if lib gets marked as complete
-            if (that.libs[dir].complete === true) {
-              yPos = h; 
-              break;
-            }
-            imgPath = dir + '/' + res[i];
-            cropImgParams = {
-              mode: 'image',
-              path: imgPath,
-              context: context,
-              x: xPos,
-              y: yPos,
-              w: iconSz,
-              h: iconSz,
-              opt: ['swab'], //TODO twin matching mode
-              dir: dir // used in swab mode to find which lib to push avg rgb values to
-            };
-            if (filters.indexOf('backgrounds') !== -1) {
-              cropImgParams.bg = 'random';
-            }
-            that.crop(cropImgParams);
-            xPos += 2*iconSz; 
-            i += 1;
+  // that inherits this function
+  var crop = function (p) {
+    var img = new Image();
+    if (p.mode === 'image') {
+      img.src = p.path; 
+      img.onload = function () {
+        var avg, colParams, bgParams, r, g, b, iconObj;
+        // add background to image
+        if (typeof p.bg !== 'undefined') {
+          bgParams = Object.create(p);
+          bgParams.mode = 'color';
+          if (p.bg === 'random') {
+            bgParams.path = randomRGB(p.filters);
+            crop(bgParams);
+          } else if (p.bg === 'clear') {
+            //do nothing
+          } else {
+            bgParams.path = p.bg;
+            crop(bgParams);
           }
-          yPos += iconSz;
-          xPos = 0;
         }
-      }); 
-    },
-    
-    test: function() {
-          var canv = document.getElementById('canvas');
-          var canvCtx = canv.getContext('2d');
-          var tileX = testSz; 
-          var tileY = testSz; 
-          var scale = 1;
-          var skip = 5;
-          var lib = 'emoji';
-          var w = canvCtx.canvas.width;
-          var h = canvCtx.canvas.height;
-          //TODO take this out of loadSelect and give a button an even listener
-          var mosaicParams = { 
-            context: canvCtx,
-            w: w,
-            h: h,
-            scale: scale,
-            tileX: tileX,
-            tileY: tileY,
-            lib: lib,
-            skip: skip,
-            bg: 'random'
+        p.context.drawImage(img, p.x, p.y, p.w, p.h);
+        // swab option is only used for populating 'select' canvas
+        if (p.opt.indexOf('swab') !== -1) {
+          avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
+          colParams = Object.create(p);
+          colParams.mode = 'color';
+          colParams.path = avg;
+          colParams.x += p.w;
+          colParams.bg = undefined;
+          iconObj = {
+            path: p.path,
+            avg: avg
           };
-          testSz -= 4;
-          this.makeMosaic(mosaicParams);
-    },
-
-    crop: function (p) {
-      var that =  this;
-      var img = new Image();
-      if (p.mode === 'image') {
-        img.src = p.path; 
-        img.onload = function () {
-          var avg, colParams, bgParams, r, g, b, iconObj;
-          // add background to image
           if (typeof p.bg !== 'undefined') {
-            bgParams = Object.create(p);
-            bgParams.mode = 'color';
-            if (p.bg === 'random') {
-              r = Math.floor(Math.random()*256);
-              g = Math.floor(Math.random()*256);
-              b = Math.floor(Math.random()*256);
-              bgParams.path = [r, g, b];
-              that.crop(bgParams);
-            } else if (p.bg === 'clear') {
-              //do nothing
-            } else {
-              bgParams.path = p.bg;
-              that.crop(bgParams);
-            }
+            iconObj.bg = bgParams.path;  
           }
-          p.context.drawImage(img, p.x, p.y, p.w, p.h);
-          // swab option is only used for populating 'select' canvas
-          if (p.opt.indexOf('swab') !== -1) {
-            avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
-            colParams = Object.create(p);
-            colParams.mode = 'color';
-            colParams.path = avg;
-            colParams.x += p.w;
-            colParams.bg = undefined;
-            iconObj = {
-              path: p.path,
-              avg: avg
-            };
-            if (typeof p.bg !== 'undefined') {
-              iconObj.bg = bgParams.path;  
-            }
-            that.libs[p.dir].icons.push(iconObj);
-            that.crop(colParams);
-            // if the last icon pushed is the last icon of the whole lib, mark it as complete
-            if (that.libs[p.dir].icons.length >= that.libs[p.dir].tot) {
-              that.libs[p.dir].complete = true;
-              console.log('loaded lib ' + p.dir + ' (' + that.libs[p.dir].icons.length + ' total images)');
-              pmpm.test(); //TODO dont run pmpm.test here (THIS IS A TEST)
-            }
+          libs[p.dir].icons.push(iconObj);
+          crop(colParams);
+          // if the last icon pushed is the last icon of the whole lib, mark it as complete
+          if (libs[p.dir].icons.length >= libs[p.dir].tot) {
+            libs[p.dir].complete = true;
+            console.log('loaded lib ' + p.dir + ' (' + libs[p.dir].icons.length + ' total images)');
+            pmpm.test(); //TODO dont run pmpm.test here (THIS IS A TEST)
           }
-        };
-      } else if (p.mode === 'color') {
-        p.context.fillStyle = 'rgb(' + Math.floor(p.path[0]) + ',' + Math.floor(p.path[1]) + ',' + Math.floor(p.path[2]) + ')';
-        p.context.fillRect(p.x, p.y, p.w, p.h);
-        p.context.save()
-      } else {
-        throw 'not a valid mode';
-      }
-    },
-   
-    getClosest: function(lib, avg) {
-       var closest = {
-         path: '',
-         dis: 256 * 256 * 256
-       };
-       var i, d;
-       for (i = 0; i < lib.length; i += 1) {
-         d = distance(lib[i].avg, avg);
-         if (d < closest.dis) {
-           closest.path = lib[i].path;
-           closest.dis = d;
-           closest.bg = lib[i].bg;
-         }
-       }
-       return closest;
-    },
-
-    makeMosaic: function(p) {
-      var imgd = p.context.getImageData(0, 0, p.w, p.h);
-      var pix = imgd.data;
-      var xt = Math.floor(p.w * p.scale);
-      var yt = Math.floor(p.h * p.scale);
-      var totXImg = Math.floor(xt / p.tileX);
-      var totYImg = Math.floor(yt / p.tileY);
-      var extraXPix = xt - (totXImg * p.tileX);
-      var extraYPix = yt - (totYImg * p.tileY);
-      var xBuf = Math.floor(extraXPix / 2); 
-      var yBuf = Math.floor(extraYPix / 2); 
-      var xi, yi, rgba, np, obj, cropParams, x, y; 
-      console.log(yt);
-      console.log(extraYPix);
-      console.log(totYImg);
-      for (yi = 0; yi < totYImg; yi += 1) {
-        for (xi = 0; xi < totXImg; xi += 1) {
-          x = xBuf + p.tileX * xi;
-          y = yBuf + p.tileY * yi;
-          avg = getAvgRGB(p.context, 5, x, y, p.tileX, p.tileY);
-          obj = this.getClosest(this.libs[p.lib].icons, avg);
-          //console.log('closest: ' + path);
-          cropParams = {
-            mode: 'image',
-            path: obj.path,
-            context: p.context,
-            x: xBuf + p.tileX*xi,
-            y: yBuf + p.tileY*yi,
-            w: p.tileX,
-            h: p.tileY,
-            opt: [],
-            bg: p.bg
-          };
-          if (typeof obj.bg !== 'undefined') {
-            if (typeof p.bg === 'undefined') {
-              cropParams.bg = obj.bg;
-            }
-          }
-          this.crop(cropParams);
         }
+      };
+    } else if (p.mode === 'color') {
+      p.context.fillStyle = 'rgb(' + Math.floor(p.path[0]) + ',' + Math.floor(p.path[1]) + ',' + Math.floor(p.path[2]) + ')';
+      p.context.fillRect(p.x, p.y, p.w, p.h);
+      p.context.save()
+    } else {
+      throw 'not a valid mode';
+    }
+  };
+
+  // function for finding closest images and returning details about it, bg param is optional
+  var getClosest = function(lib, avg) {
+    var closest = {
+      path: '',
+      dis: 256 * 256 * 256
+    };
+    var i, d;
+    for (i = 0; i < lib.length; i += 1) {
+      d = distance(lib[i].avg, avg);
+      if (d < closest.dis) {
+        closest.path = lib[i].path;
+        closest.dis = d;
+        closest.bg = lib[i].bg;
+      }
+    }
+    return closest;
+ };
+
+  var makeMosaic = function(p) {
+    var imgd = p.context.getImageData(0, 0, p.w, p.h);
+    var pix = imgd.data;
+    var xt = Math.floor(p.w * p.scale);
+    var yt = Math.floor(p.h * p.scale);
+    var totXImg = Math.floor(xt / p.tileX);
+    var totYImg = Math.floor(yt / p.tileY);
+    var extraXPix = xt - (totXImg * p.tileX);
+    var extraYPix = yt - (totYImg * p.tileY);
+    var xBuf = Math.floor(extraXPix / 2); 
+    var yBuf = Math.floor(extraYPix / 2); 
+    var xi, yi, rgba, np, obj, cropParams, x, y; 
+    console.log(yt);
+    console.log(extraYPix);
+    console.log(totYImg);
+    for (yi = 0; yi < totYImg; yi += 1) {
+      for (xi = 0; xi < totXImg; xi += 1) {
+        x = xBuf + p.tileX * xi;
+        y = yBuf + p.tileY * yi;
+        avg = getAvgRGB(p.context, 5, x, y, p.tileX, p.tileY);
+        obj = getClosest(libs[p.lib].icons, avg);
+        //console.log('closest: ' + path);
+        cropParams = {
+          mode: 'image',
+          path: obj.path,
+          context: p.context,
+          x: xBuf + p.tileX*xi,
+          y: yBuf + p.tileY*yi,
+          w: p.tileX,
+          h: p.tileY,
+          opt: [],
+          bg: p.bg
+        };
+        if (typeof obj.bg !== 'undefined') {
+          if (typeof p.bg === 'undefined') {
+            cropParams.bg = obj.bg;
+          }
+        }
+        crop(cropParams);
       }
     }
   };
+
+  // bind certain methods to that
+  that.libs = libs;
+  that.crop = crop;
+  that.getClosest = getClosest;
+  that.makeMosaic = makeMosaic;
+  that.test = test;
+
+  that.loadLib = function (context, dir, w, h, iconSz, filters) {
+    var that = this;
+    var yPos = 0;
+    var xPos = 0;
+    var jsonPath = dir + '/' + dir + '.json';
+    loadJSON(jsonPath, function (res) {
+      var i, img, avg, imgPath, cropImgParams, cropColParams;
+      if (typeof res.length === 0 || res.length === undefined) {
+        throw 'could not read images from json file at ' + jsonPath;
+      }
+      // Add lib to active libs after loaded (switch complete to true)
+      that.libs[dir] = {
+        complete: false,
+        icons: [],
+        tot: res.length
+      };
+      i = 0;
+      while (yPos + iconSz < h) {
+        while (xPos + 2*iconSz < w) {
+          if (i >= res.length) {
+            yPos = h; 
+            break;
+          }
+          // if lib gets marked as complete
+          if (that.libs[dir].complete === true) {
+            yPos = h; 
+            break;
+          }
+          imgPath = dir + '/' + res[i];
+          cropImgParams = {
+            mode: 'image',
+            path: imgPath,
+            context: context,
+            x: xPos,
+            y: yPos,
+            w: iconSz,
+            h: iconSz,
+            opt: ['swab'], //TODO twin matching mode
+            dir: dir // used in swab mode to find which lib to push avg rgb values to
+          };
+          if (filters.indexOf('backgrounds') !== -1) {
+            cropImgParams.bg = 'random';
+          }
+          that.crop(cropImgParams);
+          xPos += 2*iconSz; 
+          i += 1;
+        }
+        yPos += iconSz;
+        xPos = 0;
+      }
+    }); 
+  };
+    
+  return that;
 }();
