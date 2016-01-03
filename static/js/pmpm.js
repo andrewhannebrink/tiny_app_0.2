@@ -9,32 +9,32 @@ var pmpm = function (spec) {
   var testSz = 24;
 
   var test = function() {
-        var canv = document.getElementById('canvas');
-        var canvCtx = canv.getContext('2d');
-        var tileX = testSz; 
-        var tileY = testSz; 
-        var scale = 1;
-        var skip = 5;
-        var lib = 'emoji';
-        var w = canvCtx.canvas.width;
-        var h = canvCtx.canvas.height;
-        //TODO take this out of loadSelect and give a button an even listener
-        var mosaicParams = { 
-          context: canvCtx,
-          w: w,
-          h: h,
-          scale: scale,
-          tileX: tileX,
-          tileY: tileY,
-          lib: lib,
-          skip: skip,
-          bg: 'random'
-        };
-        testSz -= 4;
-        makeMosaic(mosaicParams);
+    var canv = document.getElementById('canvas');
+    var canvCtx = canv.getContext('2d');
+    var tileX = testSz; 
+    var tileY = testSz; 
+    var scale = 1;
+    var skip = 5;
+    var lib = 'emoji';
+    var w = canvCtx.canvas.width;
+    var h = canvCtx.canvas.height;
+    //TODO take this out of loadSelect and give a button an even listener
+    var mosaicParams = { 
+      context: canvCtx,
+      w: w,
+      h: h,
+      scale: scale,
+      tileX: tileX,
+      tileY: tileY,
+      lib: lib,
+      skip: skip,
+      bg: 'random'
+    };
+    testSz -= 4;
+    makeMosaic(mosaicParams);
   };
 
-  // private function for implementing filters
+  // private function for generating random rgb values, with an optional filters array
   var randomRGB = function (filters) {
     // TODO implement filters
     var r, g, b;
@@ -72,8 +72,6 @@ var pmpm = function (spec) {
     avg = [r/n, g/n, b/n];
     return avg; 
   };
-
-
 
   //private function for finding the distance (squared) between points in R3
   var distance = function (a, b) {
@@ -215,15 +213,7 @@ var pmpm = function (spec) {
     }
   };
 
-  // bind certain methods to that
-  that.libs = libs;
-  that.crop = crop;
-  that.getClosest = getClosest;
-  that.makeMosaic = makeMosaic;
-  that.test = test;
-
-  that.loadLib = function (context, dir, w, h, iconSz, filters) {
-    var that = this;
+  var loadLib = function (context, dir, w, h, iconSz, filters) {
     var yPos = 0;
     var xPos = 0;
     var jsonPath = dir + '/' + dir + '.json';
@@ -233,7 +223,7 @@ var pmpm = function (spec) {
         throw 'could not read images from json file at ' + jsonPath;
       }
       // Add lib to active libs after loaded (switch complete to true)
-      that.libs[dir] = {
+      libs[dir] = {
         complete: false,
         icons: [],
         tot: res.length
@@ -246,7 +236,7 @@ var pmpm = function (spec) {
             break;
           }
           // if lib gets marked as complete
-          if (that.libs[dir].complete === true) {
+          if (libs[dir].complete === true) {
             yPos = h; 
             break;
           }
@@ -265,7 +255,7 @@ var pmpm = function (spec) {
           if (filters.indexOf('backgrounds') !== -1) {
             cropImgParams.bg = 'random';
           }
-          that.crop(cropImgParams);
+          crop(cropImgParams);
           xPos += 2*iconSz; 
           i += 1;
         }
@@ -274,6 +264,14 @@ var pmpm = function (spec) {
       }
     }); 
   };
-    
+
+  // bind certain methods to "that" and return the durable module
+  that.libs = libs;
+  that.crop = crop;
+  that.getClosest = getClosest;
+  that.makeMosaic = makeMosaic;
+  that.test = test;
+  that.loadLib = loadLib;
   return that;
+
 }();
