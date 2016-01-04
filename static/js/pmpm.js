@@ -214,7 +214,9 @@ var pmpm = function (spec) {
     }
   };
 
-  var loadLib = function (context, dir, w, h, iconSz, filters, write) {
+  var loadLib = function (context, dir, iconSz, filters, write) {
+    var w = context.width;
+    var h = context.height;
     var yPos = 0;
     var xPos = 0;
     var jsonPath = dir + '/' + dir + '.json';

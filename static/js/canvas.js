@@ -1,9 +1,6 @@
 // Script for operating canvas object. uses pmpm.js, which is included in index.html
 (function () {
-  var screenW = 320;
-  var screenH = 568;
   var iconSz = 16;
-;
 
   // short-hand function for getting the context from a canvas id string
   var retContext = function(canvasId) {
@@ -14,18 +11,16 @@
 
   // loads the canvas that will hold the mosaic image
   var loadCanvas = function (dataURL) {
+    var w, h;
     var context = retContext('canvas');
-    adjustScreenSz(context, screenW, screenH);
+    context.canvas.width  = window.innerWidth;
+    context.canvas.height = window.innerHeight;
+    w = context.canvas.width;
+    h = context.canvas.height;
   
     // load image from data url
     var imageObj = new Image();
     imageObj.onload = function() {
-      var w = this.naturalWidth; 
-      var h = this.naturalHeight; 
-      console.log(w + ' ' + h);
-      adjustScreenSz(context, w, h);
-      context.canvas.width = w;
-      context.canvas.height = h;
       context.drawImage(this, 0, 0, w, h);
       loadSelect('emoji', []);
     };
@@ -39,10 +34,8 @@
   
 
   var loadSelect = function(dir, filters) {
-    var screenH = 3500;//TODO adjust for scroll so i dont have to overwrite screenH each time
     var context = retContext('select');
-    adjustScreenSz(context, screenW, screenH);
-    pmpm.loadLib(context, dir, screenW, screenH, iconSz, filters);
+    pmpm.loadLib(context, dir, iconSz, filters);
   };
 
   loadCanvas('dawson.jpg');

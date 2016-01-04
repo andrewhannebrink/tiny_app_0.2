@@ -9,7 +9,7 @@
     res.sendFile(path.join(__dirname + '/static/index.html'));
   });
 
-  var server = app.listen(8000, function () {
+  var server = app.listen(3000, function () {
     console.log('started server');
   });
 })();
