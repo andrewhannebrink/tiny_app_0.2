@@ -69,7 +69,7 @@ var pmpm = function (spec) {
         n += 1;
       }
     }
-    avg = [r/n, g/n, b/n];
+    avg = [Math.floor(r/n), Math.floor(g/n), Math.floor(b/n)];
     return avg; 
   };
 
