@@ -15,6 +15,7 @@
   // loads the canvas that will hold the mosaic image
   var loadCanvas = function (dataURL) {
     var context = retContext('canvas');
+    adjustScreenSz(context, screenW, screenH);
   
     // load image from data url
     var imageObj = new Image();
@@ -26,6 +27,7 @@
       context.canvas.width = w;
       context.canvas.height = h;
       context.drawImage(this, 0, 0, w, h);
+      loadSelect('emoji', []);
     };
     imageObj.src = dataURL;
   };
@@ -45,5 +47,5 @@
 
   loadCanvas('dawson.jpg');
   //loadSelect('emoji', ['backgrounds']);
-  loadSelect('emoji', []);
+  //loadSelect('emoji', [])
 })(); 

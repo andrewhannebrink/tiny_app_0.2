@@ -6,7 +6,7 @@ var pmpm = function (spec) {
 
   var that = {};
   var libs = {};
-  var testSz = 24;
+  var testSz = 10;
 
   var test = function() {
     var canv = document.getElementById('canvas');
@@ -18,7 +18,7 @@ var pmpm = function (spec) {
     var lib = 'emoji';
     var w = canvCtx.canvas.width;
     var h = canvCtx.canvas.height;
-    //TODO take this out of loadSelect and give a button an even listener
+    //TODO take this out of loadSelect and give a button an event listener
     var mosaicParams = { 
       context: canvCtx,
       w: w,
@@ -28,9 +28,9 @@ var pmpm = function (spec) {
       tileY: tileY,
       lib: lib,
       skip: skip,
-      bg: 'random'
+      bg: [255, 255, 255]
     };
-    testSz -= 4;
+    testSz -= 2;
     makeMosaic(mosaicParams);
   };
 
@@ -75,7 +75,6 @@ var pmpm = function (spec) {
 
   //private function for finding the distance (squared) between points in R3
   var distance = function (a, b) {
-    //TODO use exponent functions
     var d = Math.pow(a[0]-b[0], 2);
     d += Math.pow(a[1]-b[1], 2);
     d += Math.pow(a[2]-b[2], 2);
@@ -113,6 +112,7 @@ var pmpm = function (spec) {
           } else if (p.bg === 'clear') {
             //do nothing
           } else {
+            // case where bg is a color or array of colors
             bgParams.path = p.bg;
             crop(bgParams);
           }
@@ -139,6 +139,7 @@ var pmpm = function (spec) {
           if (libs[p.dir].icons.length >= libs[p.dir].tot) {
             libs[p.dir].complete = true;
             console.log('loaded lib ' + p.dir + ' (' + libs[p.dir].icons.length + ' total images)');
+            console.log(JSON.stringify(libs)); // TODO take out stringify from here
             pmpm.test(); //TODO dont run pmpm.test here (THIS IS A TEST)
           }
         }
@@ -168,7 +169,7 @@ var pmpm = function (spec) {
       }
     }
     return closest;
- };
+  };
 
   var makeMosaic = function(p) {
     var imgd = p.context.getImageData(0, 0, p.w, p.h);
@@ -213,54 +214,65 @@ var pmpm = function (spec) {
     }
   };
 
-  var loadLib = function (context, dir, w, h, iconSz, filters) {
+  var loadLib = function (context, dir, w, h, iconSz, filters, write) {
     var yPos = 0;
     var xPos = 0;
     var jsonPath = dir + '/' + dir + '.json';
     loadJSON(jsonPath, function (res) {
       var i, img, avg, imgPath, cropImgParams, cropColParams;
-      if (typeof res.length === 0 || res.length === undefined) {
-        throw 'could not read images from json file at ' + jsonPath;
-      }
-      // Add lib to active libs after loaded (switch complete to true)
-      libs[dir] = {
-        complete: false,
-        icons: [],
-        tot: res.length
-      };
-      i = 0;
-      while (yPos + iconSz < h) {
-        while (xPos + 2*iconSz < w) {
-          if (i >= res.length) {
-            yPos = h; 
-            break;
+      if (res.hasOwnProperty(dir)) {
+        // Case where json comes preloaded with each image's avg color
+        for (var lib in res) {
+          if (res.hasOwnProperty(lib)) {
+            libs[lib] = res[lib];
+            console.log(libs);
+            pmpm.test(); //TODO take pmpm test out of here
           }
-          // if lib gets marked as complete
-          if (libs[dir].complete === true) {
-            yPos = h; 
-            break;
-          }
-          imgPath = dir + '/' + res[i];
-          cropImgParams = {
-            mode: 'image',
-            path: imgPath,
-            context: context,
-            x: xPos,
-            y: yPos,
-            w: iconSz,
-            h: iconSz,
-            opt: ['swab'], //TODO twin matching mode
-            dir: dir // used in swab mode to find which lib to push avg rgb values to
-          };
-          if (filters.indexOf('backgrounds') !== -1) {
-            cropImgParams.bg = 'random';
-          }
-          crop(cropImgParams);
-          xPos += 2*iconSz; 
-          i += 1;
         }
-        yPos += iconSz;
-        xPos = 0;
+        console.log('json loaded with preloaded averages');
+      } else {
+        // Case where json is just an array of image names - takes longer
+        // Add lib to active libs after loaded (switch complete to true)
+        libs[dir] = {
+          complete: false,
+          icons: [],
+          tot: res.length
+        };
+        i = 0;
+        while (yPos + iconSz < h) {
+          while (xPos + 2*iconSz < w) {
+            // prevents 8000/emoji/domain 404 not found error
+            if (i >= res.length) {
+              yPos = h; 
+              break;
+            }
+            // if lib gets marked as complete
+            if (libs[dir].complete === true) {
+              yPos = h; 
+              break;
+            }
+            imgPath = dir + '/' + res[i];
+            cropImgParams = {
+              mode: 'image',
+              path: imgPath,
+              context: context,
+              x: xPos,
+              y: yPos,
+              w: iconSz,
+              h: iconSz,
+              opt: ['swab'], //TODO twin matching mode
+              dir: dir // used in swab mode to find which lib to push avg rgb values to
+            };
+            if (filters.indexOf('backgrounds') !== -1) {
+              cropImgParams.bg = 'random';
+            }
+            crop(cropImgParams);
+            xPos += 2*iconSz; 
+            i += 1;
+          }
+          yPos += iconSz;
+          xPos = 0;
+        }
       }
     }); 
   };
