@@ -28,7 +28,7 @@ var pmpm = function (spec) {
       tileY: tileY,
       lib: lib,
       skip: skip,
-      bg: [255, 255, 255]
+      bg: undefined
     };
     testSz -= 2;
     makeMosaic(mosaicParams);
@@ -140,7 +140,7 @@ var pmpm = function (spec) {
             libs[p.dir].complete = true;
             console.log('loaded lib ' + p.dir + ' (' + libs[p.dir].icons.length + ' total images)');
             console.log(JSON.stringify(libs)); // TODO take out stringify from here
-            pmpm.test(); //TODO dont run pmpm.test here (THIS IS A TEST)
+            test(); //TODO dont run pmpm.test here (THIS IS A TEST)
           }
         }
       };
@@ -228,7 +228,7 @@ var pmpm = function (spec) {
           if (res.hasOwnProperty(lib)) {
             libs[lib] = res[lib];
             console.log(libs);
-            pmpm.test(); //TODO take pmpm test out of here
+            test(); //TODO take pmpm test out of here
           }
         }
         console.log('json loaded with preloaded averages');
