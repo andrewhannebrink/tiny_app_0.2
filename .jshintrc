@@ -1,0 +1,12 @@
+{
+  "curly": true,
+  "eqeqeq": true,
+  "undef": true,
+  "unused": "strict",
+  "globals": {
+    "document": true,
+    "window": true,
+    "require": true,
+    "pmpm": true
+  }
+}

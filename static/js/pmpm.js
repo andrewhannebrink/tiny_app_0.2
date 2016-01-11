@@ -87,7 +87,8 @@ var pmpm = function (spec) {
     xobj.overrideMimeType("application/json");
     xobj.open('GET', jsonPath, true); // Replace 'my_data' with the path to your file
     xobj.onreadystatechange = function () {
-      if (xobj.readyState == 4 && xobj.status == "200") {
+      // OK to use '==' here
+      if (xobj.readyState == 4 && xobj.status == 200) {
         // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
         callback(JSON.parse(xobj.responseText));
       }
@@ -147,7 +148,7 @@ var pmpm = function (spec) {
     } else if (p.mode === 'color') {
       p.context.fillStyle = 'rgb(' + Math.floor(p.path[0]) + ',' + Math.floor(p.path[1]) + ',' + Math.floor(p.path[2]) + ')';
       p.context.fillRect(p.x, p.y, p.w, p.h);
-      p.context.save()
+      p.context.save();
     } else {
       throw 'not a valid mode';
     }
