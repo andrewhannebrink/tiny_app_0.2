@@ -1,5 +1,9 @@
 // pmpm.js - Photo-Mosaic Photo Module
 // Andrew Hannebrink 2015
+/*
+This is a durable module for creating photo mosaic images with html canvas.
+This durable module follows the functional modular inheritance pattern, as specified by Douglas Crockford's 'JavaScript: The Good Parts' (pg 52 - 55)
+*/
 
 // TODO implement spec
 var pmpm = function (spec) {
@@ -30,7 +34,7 @@ var pmpm = function (spec) {
     mosaicParams.skip = skip;
     mosaicParams.opt = {
       bg: undefined
-    }r
+    }
   };
 
   // Reads libs from json and adds them to the 'libs' object
