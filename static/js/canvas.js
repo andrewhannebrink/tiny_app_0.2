@@ -33,6 +33,4 @@
   };
 
   loadCanvas('dawson.jpg');
-  //loadSelect('emoji', ['backgrounds']);
-  //loadSelect('emoji', [])
 })(); 

@@ -6,9 +6,11 @@ var pmpm = function (spec) {
 
   var that = {};
   var libs = {};
-  var testSz = 16;
-
-  var test = function() {
+  
+  //TODO replace this with a backbone model and move it out of here
+  var mosaicParams = {}; 
+  var initMosaicParams = function () { 
+    var testSz = 24;
     var canv = document.getElementById('canvas');
     var canvCtx = canv.getContext('2d');
     var tileX = testSz; 
@@ -18,31 +20,27 @@ var pmpm = function (spec) {
     var lib = 'emoji';
     var w = canvCtx.canvas.width;
     var h = canvCtx.canvas.height;
-    //TODO take this out of loadSelect and give a button an event listener
-    var mosaicParams = { 
-      context: canvCtx,
-      w: w,
-      h: h,
-      scale: scale,
-      tileX: tileX,
-      tileY: tileY,
-      lib: lib,
-      skip: skip,
-      opt: {
-        bg: undefined
-      }
-    };
-    testSz -= 2;
-    makeMosaic(mosaicParams);
+    mosaicParams.context = canvCtx;
+    mosaicParams.w = w;
+    mosaicParams.h = h;
+    mosaicParams.scale = scale;
+    mosaicParams.tileX = tileX;
+    mosaicParams.tileY = tileY;
+    mosaicParams.lib = lib;
+    mosaicParams.skip = skip;
+    mosaicParams.opt = {
+      bg: undefined
+    }r
   };
-  
+
   // Reads libs from json and adds them to the 'libs' object
   var libsFromJSON = function (res) {
     for (var lib in res) {
       if (res.hasOwnProperty(lib)) {
         libs[lib] = res[lib];
         console.log(libs);
-        test(); //TODO take pmpm test out of here
+        initMosaicParams();    
+        makeMosaic(mosaicParams); //TODO dont always run makeMosaic() after loading libs from json
       }
     }
     console.log('json loaded with preloaded averages');
@@ -181,7 +179,7 @@ var pmpm = function (spec) {
           }
         }
         p.context.drawImage(img, p.x, p.y, p.w, p.h);
-        // swab option is only used for populating 'select' canvas
+        // Swab option is only used for populating 'select' canvas
         if (typeof p.opt.swab !== 'undefined') {
           avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
           colParams = Object.create(p);
@@ -203,7 +201,8 @@ var pmpm = function (spec) {
             libs[p.dir].complete = true;
             console.log('loaded lib ' + p.dir + ' (' + libs[p.dir].icons.length + ' total images)');
             console.log(JSON.stringify(libs)); // TODO take out stringify from here
-            test(); //TODO dont run pmpm.test here (THIS IS A TEST)
+            initMosaicParams();
+            makeMosaic(mosaicParams); //TODO dont run makeMosaic everytime after populated 'select' canvas
           }
         }
       };
@@ -297,12 +296,12 @@ var pmpm = function (spec) {
     }); 
   };
 
-  // bind certain methods to "that" and return the durable module
+  // Bind certain methods to "that" and return the durable module
   that.libs = libs;
   that.crop = crop;
   that.getClosest = getClosest;
   that.makeMosaic = makeMosaic;
-  that.test = test;
+  that.mosaicParams = mosaicParams; //TODO move this to backbone model
   that.loadLib = loadLib;
   return that;
 
