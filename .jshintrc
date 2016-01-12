@@ -2,11 +2,14 @@
   "curly": true,
   "eqeqeq": true,
   "undef": true,
-  "unused": "strict",
   "globals": {
     "document": true,
     "window": true,
+    "XMLHttpRequest": true,
     "require": true,
-    "pmpm": true
+    "pmpm": true,
+    "console": true,
+    "__dirname": true,
+    "Image": true
   }
 }

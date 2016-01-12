@@ -33,6 +33,58 @@ var pmpm = function (spec) {
     testSz -= 2;
     makeMosaic(mosaicParams);
   };
+  
+  // Reads libs from json and adds them to the 'libs' object
+  var libsFromJSON = function (res) {
+    for (var lib in res) {
+      if (res.hasOwnProperty(lib)) {
+        libs[lib] = res[lib];
+        console.log(libs);
+        test(); //TODO take pmpm test out of here
+      }
+    }
+    console.log('json loaded with preloaded averages');
+  };
+
+  // Populates select canvas and calculates average rgbs
+  var populateSelect = function (res, xPos, yPos, w, h, dir, iconSz, filters, write, context) {
+    var img, avg, imgPath, cropImgParams, cropColParams;
+    var i = 0;
+    while (yPos + iconSz < h) {
+      while (xPos + 2*iconSz < w) {
+        // prevents 8000/emoji/domain 404 not found error
+        if (i >= res.length) {
+          yPos = h; 
+          break;
+        } else if (libs[dir].complete === true) {
+          // if lib gets marked as complete
+          yPos = h; 
+          break;
+        } else {
+          imgPath = dir + '/' + res[i];
+          cropImgParams = {
+            mode: 'image',
+            path: imgPath,
+            context: context,
+            x: xPos,
+            y: yPos,
+            w: iconSz,
+            h: iconSz,
+            opt: ['swab'], //TODO twin matching mode
+            dir: dir // used in swab mode to find which lib to push avg rgb values to
+          };
+          if (filters.indexOf('backgrounds') !== -1) {
+            cropImgParams.bg = 'random';
+          }
+          crop(cropImgParams);
+          xPos += 2*iconSz; 
+          i += 1;
+        }
+      }
+      yPos += iconSz;
+      xPos = 0;
+    }
+  };
 
   // private function for generating random rgb values, with an optional filters array
   var randomRGB = function (filters) {
@@ -183,7 +235,7 @@ var pmpm = function (spec) {
     var extraYPix = yt - (totYImg * p.tileY);
     var xBuf = Math.floor(extraXPix / 2); 
     var yBuf = Math.floor(extraYPix / 2); 
-    var xi, yi, rgba, np, obj, cropParams, x, y; 
+    var xi, yi, rgba, np, obj, cropParams, x, y, avg; 
     console.log(yt);
     console.log(extraYPix);
     console.log(totYImg);
@@ -222,60 +274,18 @@ var pmpm = function (spec) {
     var xPos = 0;
     var jsonPath = dir + '/' + dir + '.json';
     loadJSON(jsonPath, function (res) {
-      var i, img, avg, imgPath, cropImgParams, cropColParams;
       if (res.hasOwnProperty(dir)) {
         // Case where json comes preloaded with each image's avg color
-        for (var lib in res) {
-          if (res.hasOwnProperty(lib)) {
-            libs[lib] = res[lib];
-            console.log(libs);
-            test(); //TODO take pmpm test out of here
-          }
-        }
-        console.log('json loaded with preloaded averages');
+        libsFromJSON(res);
       } else {
-        // Case where json is just an array of image names - takes longer
+        // Case where json is just an array of image names
         // Add lib to active libs after loaded (switch complete to true)
         libs[dir] = {
           complete: false,
           icons: [],
           tot: res.length
         };
-        i = 0;
-        while (yPos + iconSz < h) {
-          while (xPos + 2*iconSz < w) {
-            // prevents 8000/emoji/domain 404 not found error
-            if (i >= res.length) {
-              yPos = h; 
-              break;
-            }
-            // if lib gets marked as complete
-            if (libs[dir].complete === true) {
-              yPos = h; 
-              break;
-            }
-            imgPath = dir + '/' + res[i];
-            cropImgParams = {
-              mode: 'image',
-              path: imgPath,
-              context: context,
-              x: xPos,
-              y: yPos,
-              w: iconSz,
-              h: iconSz,
-              opt: ['swab'], //TODO twin matching mode
-              dir: dir // used in swab mode to find which lib to push avg rgb values to
-            };
-            if (filters.indexOf('backgrounds') !== -1) {
-              cropImgParams.bg = 'random';
-            }
-            crop(cropImgParams);
-            xPos += 2*iconSz; 
-            i += 1;
-          }
-          yPos += iconSz;
-          xPos = 0;
-        }
+        populateSelect(res, xPos, yPos, w, h, dir, iconSz, filters, write, context);
       }
     }); 
   };

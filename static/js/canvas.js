@@ -27,12 +27,6 @@
     imageObj.src = dataURL;
   };
 
-  var adjustScreenSz = function(context, w, h) {
-    context.canvas.width = w;
-    context.canvas.height = h;
-  };
-  
-
   var loadSelect = function(dir, filters) {
     var context = retContext('select');
     pmpm.loadLib(context, dir, iconSz, filters);
