@@ -22,7 +22,7 @@
     var imageObj = new Image();
     imageObj.onload = function() {
       context.drawImage(this, 0, 0, w, h);
-      loadSelect('emoji', []);
+      loadSelect('emoji', {backgrounds: true});
     };
     imageObj.src = dataURL;
   };

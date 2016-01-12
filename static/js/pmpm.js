@@ -6,7 +6,7 @@ var pmpm = function (spec) {
 
   var that = {};
   var libs = {};
-  var testSz = 10;
+  var testSz = 16;
 
   var test = function() {
     var canv = document.getElementById('canvas');
@@ -28,7 +28,9 @@ var pmpm = function (spec) {
       tileY: tileY,
       lib: lib,
       skip: skip,
-      bg: undefined
+      opt: {
+        bg: undefined
+      }
     };
     testSz -= 2;
     makeMosaic(mosaicParams);
@@ -47,8 +49,12 @@ var pmpm = function (spec) {
   };
 
   // Populates select canvas and calculates average rgbs
-  var populateSelect = function (res, xPos, yPos, w, h, dir, iconSz, filters, write, context) {
-    var img, avg, imgPath, cropImgParams, cropColParams;
+  var populateSelect = function (res, dir, iconSz, filters, write, context) {
+    var img, avg, imgPath, cropImgParams;
+    var w = context.width;
+    var h = context.height;
+    var yPos = 0;
+    var xPos = 0;
     var i = 0;
     while (yPos + iconSz < h) {
       while (xPos + 2*iconSz < w) {
@@ -70,11 +76,15 @@ var pmpm = function (spec) {
             y: yPos,
             w: iconSz,
             h: iconSz,
-            opt: ['swab'], //TODO twin matching mode
+            opt: {
+              swab: true
+            }, //TODO twin matching mode
             dir: dir // used in swab mode to find which lib to push avg rgb values to
           };
-          if (filters.indexOf('backgrounds') !== -1) {
-            cropImgParams.bg = 'random';
+          if (filters.hasOwnProperty('backgrounds')) {
+            if (filters.backgrounds === 'random') {
+              cropImgParams.opt.bg = 'random';
+            }
           }
           crop(cropImgParams);
           xPos += 2*iconSz; 
@@ -148,43 +158,43 @@ var pmpm = function (spec) {
     xobj.send(null);  
   };
 
-  // that inherits this function
+  // That inherits this function
   var crop = function (p) {
     var img = new Image();
     if (p.mode === 'image') {
       img.src = p.path; 
       img.onload = function () {
         var avg, colParams, bgParams, r, g, b, iconObj;
-        // add background to image
-        if (typeof p.bg !== 'undefined') {
+        // Add background to image
+        if (typeof p.opt.bg !== 'undefined') {
           bgParams = Object.create(p);
           bgParams.mode = 'color';
-          if (p.bg === 'random') {
+          if (p.opt.bg === 'random') {
             bgParams.path = randomRGB(p.filters);
             crop(bgParams);
-          } else if (p.bg === 'clear') {
-            //do nothing
+          } else if (p.opt.bg === 'clear') {
+            // Do nothing
           } else {
             // case where bg is a color or array of colors
-            bgParams.path = p.bg;
+            bgParams.path = p.opt.bg;
             crop(bgParams);
           }
         }
         p.context.drawImage(img, p.x, p.y, p.w, p.h);
         // swab option is only used for populating 'select' canvas
-        if (p.opt.indexOf('swab') !== -1) {
+        if (typeof p.opt.swab !== 'undefined') {
           avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
           colParams = Object.create(p);
           colParams.mode = 'color';
           colParams.path = avg;
           colParams.x += p.w;
-          colParams.bg = undefined;
+          colParams.opt.bg = undefined;
           iconObj = {
             path: p.path,
             avg: avg
           };
-          if (typeof p.bg !== 'undefined') {
-            iconObj.bg = bgParams.path;  
+          if (typeof p.opt.bg !== 'undefined') {
+            iconObj.opt.bg = bgParams.path;  
           }
           libs[p.dir].icons.push(iconObj);
           crop(colParams);
@@ -254,12 +264,13 @@ var pmpm = function (spec) {
           y: yBuf + p.tileY*yi,
           w: p.tileX,
           h: p.tileY,
-          opt: [],
-          bg: p.bg
+          opt: {
+            bg: p.opt.bg
+          },
         };
         if (typeof obj.bg !== 'undefined') {
-          if (typeof p.bg === 'undefined') {
-            cropParams.bg = obj.bg;
+          if (typeof p.opt.bg === 'undefined') {
+            cropParams.opt.bg = obj.bg;
           }
         }
         crop(cropParams);
@@ -268,10 +279,6 @@ var pmpm = function (spec) {
   };
 
   var loadLib = function (context, dir, iconSz, filters, write) {
-    var w = context.width;
-    var h = context.height;
-    var yPos = 0;
-    var xPos = 0;
     var jsonPath = dir + '/' + dir + '.json';
     loadJSON(jsonPath, function (res) {
       if (res.hasOwnProperty(dir)) {
@@ -285,7 +292,7 @@ var pmpm = function (spec) {
           icons: [],
           tot: res.length
         };
-        populateSelect(res, xPos, yPos, w, h, dir, iconSz, filters, write, context);
+        populateSelect(res, dir, iconSz, filters, write, context);
       }
     }); 
   };
