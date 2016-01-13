@@ -53,7 +53,6 @@ var pmpm = function (spec) {
         makeMosaic(mosaicParams); //TODO dont always run makeMosaic() after loading libs from json
       }
     }
-    console.log('json loaded with preloaded averages');
   };
 
   // Populates select canvas and calculates average rgbs
@@ -64,7 +63,6 @@ var pmpm = function (spec) {
     var yPos = 0;
     var xPos = 0;
     var i = 0;
-    console.log('running populateSelect()' + w + ' ' + h);
     while (yPos + iconSz < h) {
       while (xPos + 2*iconSz < w) {
         // prevents 8000/emoji/domain 404 not found error
@@ -169,8 +167,6 @@ var pmpm = function (spec) {
 
   // That inherits this function
   var crop = function (p) {
-    console.log('crop() ');
-    console.log(p);
     var img = new Image();
     if (p.mode === 'image') {
       img.src = p.path; 
@@ -198,7 +194,6 @@ var pmpm = function (spec) {
         p.context.drawImage(img, p.x, p.y, p.w, p.h);
         // Swab option is only used for populating 'select' canvas
         if (typeof p.opt.swab !== 'undefined') {
-          console.log('inside swab option...' + p.opt.bg);
           avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
           colParams = Object.create(p);
           colParams.mode = 'color';
@@ -264,7 +259,6 @@ var pmpm = function (spec) {
         y = yBuf + p.tileY * yi;
         avg = getAvgRGB(p.context, 5, x, y, p.tileX, p.tileY);
         obj = getClosest(libs[p.lib].icons, avg);
-        //console.log('closest: ' + path);
         cropParams = {
           mode: 'image',
           path: obj.path,
