@@ -9,8 +9,18 @@ This durable module follows the functional modular inheritance pattern, as speci
 var pmpm = function (spec) {
 
   var that = {};
+
   var libs = {};
-    // short-hand function for getting the context from a canvas id string
+
+  var makeEmptyLib = function (tot) {
+    return {
+      complete: false,
+      icons: [],
+      tot: tot
+    }
+  };
+
+  // Gets the context from a canvas id string
   var retContext = function(canvasId) {
     var canvas = document.getElementById(canvasId);
     var context = canvas.getContext('2d');
@@ -114,6 +124,49 @@ var pmpm = function (spec) {
     }
     return [r, g, b];
   };
+  
+  // Makes background parameters for crop function in 'color mode', then calls crop()
+  // Also adds bg property to iconObj for saving iconObj in pmpm.libs along with its correct background color
+  var makeBgParamsThenCrop = function (p, iconObj) {
+    var bgParams = Object.create(p);
+    bgParams.mode = 'color';
+    if (p.opt.bg === 'random') {
+      // TODO only add to iconObj if swab is true
+      bgParams.path = randomRGB(p.filters);
+      iconObj.bg = bgParams.path;
+      crop(bgParams);
+    } else if (p.opt.bg === 'clear') {
+      // Do nothing
+    } else {
+      // case where bg is a color or array of colors
+      bgParams.path = p.opt.bg;
+      iconObj.bg = p.opt.bg;
+      crop(bgParams);
+    }
+  };
+
+  // Crops a swab of the average color to the right of the cropped image defined in p
+  // Also builds iconObj in preparation to be added to pmpm.libs
+  var cropSwab = function (p, iconObj) {
+    var avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
+    var colParams = Object.create(p);
+    colParams.mode = 'color';
+    colParams.path = avg;
+    colParams.x += p.w;
+    colParams.opt.bg = undefined;
+    iconObj.path = p.path;
+    iconObj.avg = avg;
+    libs[p.key].icons.push(iconObj);
+    crop(colParams);
+    // if the last icon pushed is the last icon of the whole lib, mark it as complete
+    if (libs[p.key].icons.length >= libs[p.key].tot) {
+      libs[p.key].complete = true;
+      console.log('loaded lib ' + p.key + ' (' + libs[p.key].icons.length + ' total images)');
+      //console.log(JSON.stringify(libs)); // TODO take out stringify from here
+      initMosaicParams();
+      makeMosaic(mosaicParams); //TODO dont run makeMosaic everytime after populated 'select' canvas
+    }
+  };
 
   // private function for return avg rgb in a region
   var getAvgRGB = function (context, skip, x, y, w, h) {
@@ -172,46 +225,14 @@ var pmpm = function (spec) {
       img.src = p.path; 
       img.onload = function () {
         var iconObj = {};
-        var avg, colParams, bgParams, r, g, b;
-        // Add background to image
         if (typeof p.opt.bg !== 'undefined') {
-          bgParams = Object.create(p);
-          bgParams.mode = 'color';
-          if (p.opt.bg === 'random') {
-            // TODO only add to iconObj if swab is true
-            bgParams.path = randomRGB(p.filters);
-            iconObj.bg = bgParams.path;
-            crop(bgParams);
-          } else if (p.opt.bg === 'clear') {
-            // Do nothing
-          } else {
-            // case where bg is a color or array of colors
-            bgParams.path = p.opt.bg;
-            iconObj.bg = p.opt.bg;
-            crop(bgParams);
-          }
+          // Add background to image
+          makeBgParamsThenCrop(p, iconObj);
         }
         p.context.drawImage(img, p.x, p.y, p.w, p.h);
-        // Swab option is only used for populating 'select' canvas
         if (typeof p.opt.swab !== 'undefined') {
-          avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
-          colParams = Object.create(p);
-          colParams.mode = 'color';
-          colParams.path = avg;
-          colParams.x += p.w;
-          colParams.opt.bg = undefined;
-          iconObj.path = p.path;
-          iconObj.avg = avg;
-          libs[p.key].icons.push(iconObj);
-          crop(colParams);
-          // if the last icon pushed is the last icon of the whole lib, mark it as complete
-          if (libs[p.key].icons.length >= libs[p.key].tot) {
-            libs[p.key].complete = true;
-            console.log('loaded lib ' + p.key + ' (' + libs[p.key].icons.length + ' total images)');
-            //console.log(JSON.stringify(libs)); // TODO take out stringify from here
-            initMosaicParams();
-            makeMosaic(mosaicParams); //TODO dont run makeMosaic everytime after populated 'select' canvas
-          }
+          // Swab option is only used for populating 'select' canvas
+          cropSwab(p, iconObj);
         }
       };
     } else if (p.mode === 'color') {
@@ -294,11 +315,7 @@ var pmpm = function (spec) {
         } else {
           // Case where json is just an array of image names
           // Add lib to active libs after loaded (switch complete to true)
-          libs[dir] = {
-            complete: false,
-            icons: [],
-            tot: res.length
-          };
+          libs[dir] = makeEmptyLib(res.length);
           populateSelect(res, dir, dir, iconSz, filters, write, context);
         }
       }); 
@@ -314,11 +331,7 @@ var pmpm = function (spec) {
           for (j = 0; j < lib.icons.length; j += 1) {
             arr.push(lib.icons[j].path.split('/')[1]);
           }
-          libs[key] = {
-            complete: false,
-            icons: [],
-            tot: arr.length
-          };
+          libs[key] = makeEmptyLib(arr.length);
           populateSelect(arr, dir, key, iconSz, filters, write, context);
           break;
         }
