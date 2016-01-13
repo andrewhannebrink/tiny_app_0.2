@@ -10,11 +10,18 @@ var pmpm = function (spec) {
 
   var that = {};
   var libs = {};
+    // short-hand function for getting the context from a canvas id string
+  var retContext = function(canvasId) {
+    var canvas = document.getElementById(canvasId);
+    var context = canvas.getContext('2d');
+    return context;
+  };
+
   
   //TODO replace this with a backbone model and move it out of here
   var mosaicParams = {}; 
   var initMosaicParams = function () { 
-    var testSz = 24;
+    var testSz = 128;
     var canv = document.getElementById('canvas');
     var canvCtx = canv.getContext('2d');
     var tileX = testSz; 
@@ -34,7 +41,7 @@ var pmpm = function (spec) {
     mosaicParams.skip = skip;
     mosaicParams.opt = {
       bg: undefined
-    }
+    };
   };
 
   // Reads libs from json and adds them to the 'libs' object
@@ -42,7 +49,6 @@ var pmpm = function (spec) {
     for (var lib in res) {
       if (res.hasOwnProperty(lib)) {
         libs[lib] = res[lib];
-        console.log(libs);
         initMosaicParams();    
         makeMosaic(mosaicParams); //TODO dont always run makeMosaic() after loading libs from json
       }
@@ -51,20 +57,21 @@ var pmpm = function (spec) {
   };
 
   // Populates select canvas and calculates average rgbs
-  var populateSelect = function (res, dir, iconSz, filters, write, context) {
+  var populateSelect = function (res, dir, key, iconSz, filters, write, context) {
     var img, avg, imgPath, cropImgParams;
-    var w = context.width;
-    var h = context.height;
+    var w = context.canvas.width;
+    var h = context.canvas.height;
     var yPos = 0;
     var xPos = 0;
     var i = 0;
+    console.log('running populateSelect()' + w + ' ' + h);
     while (yPos + iconSz < h) {
       while (xPos + 2*iconSz < w) {
         // prevents 8000/emoji/domain 404 not found error
         if (i >= res.length) {
           yPos = h; 
           break;
-        } else if (libs[dir].complete === true) {
+        } else if (libs[key].complete === true) {
           // if lib gets marked as complete
           yPos = h; 
           break;
@@ -79,9 +86,9 @@ var pmpm = function (spec) {
             w: iconSz,
             h: iconSz,
             opt: {
-              swab: true
+              swab: true,
             }, //TODO twin matching mode
-            dir: dir // used in swab mode to find which lib to push avg rgb values to
+            key: key // used in swab mode to find which lib to push avg rgb values to
           };
           if (filters.hasOwnProperty('backgrounds')) {
             if (filters.backgrounds === 'random') {
@@ -162,49 +169,51 @@ var pmpm = function (spec) {
 
   // That inherits this function
   var crop = function (p) {
+    console.log('crop() ');
+    console.log(p);
     var img = new Image();
     if (p.mode === 'image') {
       img.src = p.path; 
       img.onload = function () {
-        var avg, colParams, bgParams, r, g, b, iconObj;
+        var iconObj = {};
+        var avg, colParams, bgParams, r, g, b;
         // Add background to image
         if (typeof p.opt.bg !== 'undefined') {
           bgParams = Object.create(p);
           bgParams.mode = 'color';
           if (p.opt.bg === 'random') {
+            // TODO only add to iconObj if swab is true
             bgParams.path = randomRGB(p.filters);
+            iconObj.bg = bgParams.path;
             crop(bgParams);
           } else if (p.opt.bg === 'clear') {
             // Do nothing
           } else {
             // case where bg is a color or array of colors
             bgParams.path = p.opt.bg;
+            iconObj.bg = p.opt.bg;
             crop(bgParams);
           }
         }
         p.context.drawImage(img, p.x, p.y, p.w, p.h);
         // Swab option is only used for populating 'select' canvas
         if (typeof p.opt.swab !== 'undefined') {
+          console.log('inside swab option...' + p.opt.bg);
           avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
           colParams = Object.create(p);
           colParams.mode = 'color';
           colParams.path = avg;
           colParams.x += p.w;
           colParams.opt.bg = undefined;
-          iconObj = {
-            path: p.path,
-            avg: avg
-          };
-          if (typeof p.opt.bg !== 'undefined') {
-            iconObj.opt.bg = bgParams.path;  
-          }
-          libs[p.dir].icons.push(iconObj);
+          iconObj.path = p.path;
+          iconObj.avg = avg;
+          libs[p.key].icons.push(iconObj);
           crop(colParams);
           // if the last icon pushed is the last icon of the whole lib, mark it as complete
-          if (libs[p.dir].icons.length >= libs[p.dir].tot) {
-            libs[p.dir].complete = true;
-            console.log('loaded lib ' + p.dir + ' (' + libs[p.dir].icons.length + ' total images)');
-            console.log(JSON.stringify(libs)); // TODO take out stringify from here
+          if (libs[p.key].icons.length >= libs[p.key].tot) {
+            libs[p.key].complete = true;
+            console.log('loaded lib ' + p.key + ' (' + libs[p.key].icons.length + ' total images)');
+            //console.log(JSON.stringify(libs)); // TODO take out stringify from here
             initMosaicParams();
             makeMosaic(mosaicParams); //TODO dont run makeMosaic everytime after populated 'select' canvas
           }
@@ -249,9 +258,6 @@ var pmpm = function (spec) {
     var xBuf = Math.floor(extraXPix / 2); 
     var yBuf = Math.floor(extraYPix / 2); 
     var xi, yi, rgba, np, obj, cropParams, x, y, avg; 
-    console.log(yt);
-    console.log(extraYPix);
-    console.log(totYImg);
     for (yi = 0; yi < totYImg; yi += 1) {
       for (xi = 0; xi < totXImg; xi += 1) {
         x = xBuf + p.tileX * xi;
@@ -281,24 +287,60 @@ var pmpm = function (spec) {
     }
   };
 
+  // Either adds to libs from json if libs is empty, or adds a lib to libs 
   var loadLib = function (context, dir, iconSz, filters, write) {
     var jsonPath = dir + '/' + dir + '.json';
-    loadJSON(jsonPath, function (res) {
-      if (res.hasOwnProperty(dir)) {
-        // Case where json comes preloaded with each image's avg color
-        libsFromJSON(res);
-      } else {
-        // Case where json is just an array of image names
-        // Add lib to active libs after loaded (switch complete to true)
-        libs[dir] = {
-          complete: false,
-          icons: [],
-          tot: res.length
-        };
-        populateSelect(res, dir, iconSz, filters, write, context);
+    var keys, i, j, arr, lib, key;
+    if (Object.keys(libs).length === 0) {
+      loadJSON(jsonPath, function (res) {
+        console.log('initializing libs from json');
+        if (res.hasOwnProperty(dir)) {
+          // Case where json comes preloaded with each image's avg color
+          libsFromJSON(res);
+        } else {
+          // Case where json is just an array of image names
+          // Add lib to active libs after loaded (switch complete to true)
+          libs[dir] = {
+            complete: false,
+            icons: [],
+            tot: res.length
+          };
+          populateSelect(res, dir, dir, iconSz, filters, write, context);
+        }
+      }); 
+    } else {
+      keys = Object.keys(libs);
+      for (i = 0; i < keys.length; i += 1) {
+        if (keys[i].split('-')[0] === dir) {
+          // Create array of image paths from matching key and call populateSelect() with that array
+          console.log('matched lib');
+          arr = [];
+          lib = libs[keys[i]];
+          key = dir + '-' + keys.length;
+          for (j = 0; j < lib.icons.length; j += 1) {
+            arr.push(lib.icons[j].path.split('/')[1]);
+          }
+          libs[key] = {
+            complete: false,
+            icons: [],
+            tot: arr.length
+          };
+          populateSelect(arr, dir, key, iconSz, filters, write, context);
+          break;
+        }
       }
-    }); 
+    }
   };
+ 
+  // Loads select canvas
+  var loadSelect = function(dir, filters, iconSz) {
+    var context = retContext('select');
+    if (typeof iconSz === 'undefined') {
+      iconSz = 16;
+    }
+    loadLib(context, dir, iconSz, filters);
+  };
+
 
   // Bind certain methods to "that" and return the durable module
   that.libs = libs;
@@ -307,6 +349,8 @@ var pmpm = function (spec) {
   that.makeMosaic = makeMosaic;
   that.mosaicParams = mosaicParams; //TODO move this to backbone model
   that.loadLib = loadLib;
+  that.loadSelect = loadSelect;
+  that.retContext = retContext;
   return that;
 
 }();
