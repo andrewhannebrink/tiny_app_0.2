@@ -15,7 +15,6 @@ var pmpm = function (spec) {
 
   var cmp = new models.MosaicParams({lib: 'emoji'}); 
 
-
   // Initializes empty lib object to be added to libs
   var makeEmptyLib = function (tot) {
     return {
