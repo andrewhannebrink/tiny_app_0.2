@@ -14,6 +14,7 @@
     pmpm.cmp.attributes.lib = lib;
     pmpm.cmp.tileX = sz;
     pmpm.cmp.tileY = sz;
+    //TODO parse color rr-gg-bb format bg
     if (bg !== null) {
       pmpm.cmp.opt.bg = bg;
     } else {
