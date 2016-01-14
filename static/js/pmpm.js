@@ -12,12 +12,17 @@ var pmpm = function (spec) {
 
   var libs = {};
 
+
+  var cmp = new models.MosaicParams({lib: 'emoji'}); 
+
+
+  // Initializes empty lib object to be added to libs
   var makeEmptyLib = function (tot) {
     return {
       complete: false,
       icons: [],
       tot: tot
-    }
+    };
   };
 
   // Gets the context from a canvas id string
@@ -27,40 +32,13 @@ var pmpm = function (spec) {
     return context;
   };
 
-  
-  //TODO replace this with a backbone model and move it out of here
-  var mosaicParams = {}; 
-  var initMosaicParams = function () { 
-    var testSz = 128;
-    var canv = document.getElementById('canvas');
-    var canvCtx = canv.getContext('2d');
-    var tileX = testSz; 
-    var tileY = testSz; 
-    var scale = 1;
-    var skip = 5;
-    var lib = 'emoji';
-    var w = canvCtx.canvas.width;
-    var h = canvCtx.canvas.height;
-    mosaicParams.context = canvCtx;
-    mosaicParams.w = w;
-    mosaicParams.h = h;
-    mosaicParams.scale = scale;
-    mosaicParams.tileX = tileX;
-    mosaicParams.tileY = tileY;
-    mosaicParams.lib = lib;
-    mosaicParams.skip = skip;
-    mosaicParams.opt = {
-      bg: undefined
-    };
-  };
-
   // Reads libs from json and adds them to the 'libs' object
   var libsFromJSON = function (res) {
     for (var lib in res) {
       if (res.hasOwnProperty(lib)) {
         libs[lib] = res[lib];
-        initMosaicParams();    
-        makeMosaic(mosaicParams); //TODO dont always run makeMosaic() after loading libs from json
+        cmp.initialize({lib: lib});    
+        makeMosaic(cmp); //TODO dont always run makeMosaic() after loading libs from json
       }
     }
   };
@@ -163,12 +141,12 @@ var pmpm = function (spec) {
       libs[p.key].complete = true;
       console.log('loaded lib ' + p.key + ' (' + libs[p.key].icons.length + ' total images)');
       //console.log(JSON.stringify(libs)); // TODO take out stringify from here
-      initMosaicParams();
-      makeMosaic(mosaicParams); //TODO dont run makeMosaic everytime after populated 'select' canvas
+      cmp.initialize({lib: p.key});
+      makeMosaic(cmp); //TODO dont run makeMosaic everytime after populated 'select' canvas
     }
   };
 
-  // private function for return avg rgb in a region
+  // Return avg rgb in a region
   var getAvgRGB = function (context, skip, x, y, w, h) {
     var imgd = context.getImageData(x, y, w, h);
     var pix = imgd.data;
@@ -177,7 +155,6 @@ var pmpm = function (spec) {
     var g = 0;
     var b = 0;
     var n = 0;
-
     for (i = 0; i < pix.length; i += 4) {
       if (pix[i] === 0 && pix[i+1] === 0 && pix[i+2] === 0 && pix[i+3] === 0) {
         r += 255;
@@ -279,7 +256,7 @@ var pmpm = function (spec) {
         x = xBuf + p.tileX * xi;
         y = yBuf + p.tileY * yi;
         avg = getAvgRGB(p.context, 5, x, y, p.tileX, p.tileY);
-        obj = getClosest(libs[p.lib].icons, avg);
+        obj = getClosest(libs[p.attributes.lib].icons, avg);
         cropParams = {
           mode: 'image',
           path: obj.path,
@@ -354,7 +331,7 @@ var pmpm = function (spec) {
   that.crop = crop;
   that.getClosest = getClosest;
   that.makeMosaic = makeMosaic;
-  that.mosaicParams = mosaicParams; //TODO move this to backbone model
+  that.cmp = cmp; //TODO move this to backbone model
   that.loadLib = loadLib;
   that.loadSelect = loadSelect;
   that.retContext = retContext;
