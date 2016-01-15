@@ -3,6 +3,15 @@ body {
   padding: 0 !important;
 }
 
+table {
+  height:64px;
+  width: 100%;
+  max-width: 320px;
+}
+td {
+  text-align:center;
+}
+
 canvas {
   width: 100vw;
   height: 100vh;
@@ -14,4 +23,9 @@ select {
   height: 300px;
   z-index: 100;
   position: static;
+}
+
+.but {
+  width:40px;
+  height:40px;
 }
