@@ -9,12 +9,23 @@ app.router = function () {
     }
   });
 
+  // Converts hex string from router and returns an rgb array
+  var hexToRgb = function (hex) {
+    var r = parseInt(hex.slice(0, 2), 16);
+    var g = parseInt(hex.slice(2, 4), 16);
+    var b = parseInt(hex.slice(4, 6), 16);
+    return [r, g, b];
+  };
+
+  //
   var updateCMP = function (lib, sz, bg) {
     app.cmp.attributes.lib = lib; 
     app.cmp.tileX = sz; 
     app.cmp.tileY = sz; 
-    if (bg !== null) {
+    if (app.cmp.opt.bg === 'random' || app.cmp.opt === 'clear') {
       app.cmp.opt.bg = bg;
+    } else if (bg !== null) {
+      app.cmp.opt.bg = hexToRgb(bg);
     } else {
       app.cmp.opt.bg = undefined;
     }
