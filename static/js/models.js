@@ -1,4 +1,4 @@
-var models = function () {
+app.models = function () {
   var that = {};
 
   // Model for mosaic parameters
@@ -11,6 +11,7 @@ var models = function () {
       } else {
         tileSz = attributes.tileSz;
       }
+      //TODO get context somehow else (pass as param maybe?)
       var canv = document.getElementById('canvas');
       var canvCtx = canv.getContext('2d');
       this.w = canvCtx.canvas.width;

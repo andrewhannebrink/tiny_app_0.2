@@ -6,14 +6,11 @@ This durable module follows the functional modular inheritance pattern, as speci
 */
 
 // TODO implement spec
-var pmpm = function (spec) {
+app.pmpm = function (spec) {
 
   var that = {};
 
   var libs = {};
-
-
-  var cmp = new models.MosaicParams({lib: 'emoji'}); 
 
   // Initializes empty lib object to be added to libs
   var makeEmptyLib = function (tot) {
@@ -32,7 +29,7 @@ var pmpm = function (spec) {
   };
 
   // Reads libs from json and adds them to the 'libs' object
-  var libsFromJSON = function (res) {
+  var libsFromJSON = function (cmp, res) {
     for (var lib in res) {
       if (res.hasOwnProperty(lib)) {
         libs[lib] = res[lib];
@@ -43,7 +40,7 @@ var pmpm = function (spec) {
   };
 
   // Populates select canvas and calculates average rgbs
-  var populateSelect = function (res, dir, key, iconSz, filters, write, context) {
+  var populateSelect = function (cmp, res, dir, key, iconSz, filters, write, context) {
     var img, avg, imgPath, cropImgParams;
     var w = context.canvas.width;
     var h = context.canvas.height;
@@ -80,7 +77,7 @@ var pmpm = function (spec) {
               cropImgParams.opt.bg = 'random';
             }
           }
-          crop(cropImgParams);
+          crop(cropImgParams, cmp);
           xPos += 2*iconSz; 
           i += 1;
         }
@@ -124,7 +121,7 @@ var pmpm = function (spec) {
 
   // Crops a swab of the average color to the right of the cropped image defined in p
   // Also builds iconObj in preparation to be added to pmpm.libs
-  var cropSwab = function (p, iconObj) {
+  var cropSwab = function (cmp, p, iconObj) {
     var avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
     var colParams = Object.create(p);
     colParams.mode = 'color';
@@ -194,8 +191,10 @@ var pmpm = function (spec) {
     xobj.send(null);  
   };
 
-  // That inherits this function
-  var crop = function (p) {
+  // Crops image or color in rectangle
+  // If p.opt.swab === true, optional parameter cmp is required so that cropSwab() can 
+  // change the cmp when the tiny img lib is done loading
+  var crop = function (p, cmp) {
     var img = new Image();
     if (p.mode === 'image') {
       img.src = p.path; 
@@ -208,7 +207,7 @@ var pmpm = function (spec) {
         p.context.drawImage(img, p.x, p.y, p.w, p.h);
         if (typeof p.opt.swab !== 'undefined') {
           // Swab option is only used for populating 'select' canvas
-          cropSwab(p, iconObj);
+          cropSwab(cmp, p, iconObj);
         }
       };
     } else if (p.mode === 'color') {
@@ -279,7 +278,7 @@ var pmpm = function (spec) {
   };
 
   // Either adds to libs from json if libs is empty, or adds a lib to libs 
-  var loadLib = function (context, dir, iconSz, filters, write) {
+  var loadLib = function (cmp, context, dir, iconSz, filters, write) {
     var jsonPath = dir + '/' + dir + '.json';
     var keys, i, j, arr, lib, key;
     if (Object.keys(libs).length === 0) {
@@ -287,12 +286,12 @@ var pmpm = function (spec) {
         console.log('initializing libs from json');
         if (res.hasOwnProperty(dir)) {
           // Case where json comes preloaded with each image's avg color
-          libsFromJSON(res);
+          libsFromJSON(cmp, res);
         } else {
           // Case where json is just an array of image names
           // Add lib to active libs after loaded (switch complete to true)
           libs[dir] = makeEmptyLib(res.length);
-          populateSelect(res, dir, dir, iconSz, filters, write, context);
+          populateSelect(cmp, res, dir, dir, iconSz, filters, write, context);
         }
       }); 
     } else {
@@ -308,7 +307,7 @@ var pmpm = function (spec) {
             arr.push(lib.icons[j].path.split('/')[1]);
           }
           libs[key] = makeEmptyLib(arr.length);
-          populateSelect(arr, dir, key, iconSz, filters, write, context);
+          populateSelect(cmp, arr, dir, key, iconSz, filters, write, context);
           break;
         }
       }
@@ -316,12 +315,12 @@ var pmpm = function (spec) {
   };
  
   // Loads select canvas
-  var loadSelect = function(dir, filters, iconSz) {
+  var loadSelect = function(cmp, dir, filters, iconSz) {
     var context = retContext('select');
     if (typeof iconSz === 'undefined') {
       iconSz = 16;
     }
-    loadLib(context, dir, iconSz, filters);
+    loadLib(cmp, context, dir, iconSz, filters);
   };
 
 
@@ -330,7 +329,7 @@ var pmpm = function (spec) {
   that.crop = crop;
   that.getClosest = getClosest;
   that.makeMosaic = makeMosaic;
-  that.cmp = cmp; //TODO move this to backbone model
+  //that.cmp = cmp; //TODO move this to backbone model
   that.loadLib = loadLib;
   that.loadSelect = loadSelect;
   that.retContext = retContext;
