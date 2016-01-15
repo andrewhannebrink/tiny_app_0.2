@@ -19,7 +19,9 @@ app.views = function () {
       pathStr += cmp.tileX + '-';
       pathStr += cmp.tileY;
     }
-    if (typeof cmp.opt.bg !== 'undefined') {
+    if (cmp.opt.bg === 'clear' || cmp.opt.bg === 'random') {
+      pathStr += '/' + cmp.opt.bg;
+    } else if (typeof cmp.opt.bg !== 'undefined') {
       pathStr += '/' + toHexStr(cmp.opt.bg);
     }
     return pathStr;
@@ -33,7 +35,8 @@ app.views = function () {
     iconify: function () {
       var route = cmpToRoute('a/', app.cmp);
       console.log('inside iconify');
-      app.router.navigate(route, {trigger: true});
+      console.log(route);
+      app.router.navigate(route, {trigger: true, replace: true});
     }
   });
 

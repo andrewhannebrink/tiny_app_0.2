@@ -20,9 +20,15 @@ app.router = function () {
   //
   var updateCMP = function (lib, sz, bg) {
     app.cmp.attributes.lib = lib; 
-    app.cmp.tileX = sz; 
-    app.cmp.tileY = sz; 
-    if (app.cmp.opt.bg === 'random' || app.cmp.opt === 'clear') {
+    sz = sz.split('-');
+    if (sz.length === 1) {
+      app.cmp.tileX = sz[0]; 
+      app.cmp.tileY = sz[0]; 
+    } else {
+      app.cmp.tileX = sz[0]; 
+      app.cmp.tileY = sz[1]; 
+    }
+    if (bg === 'random' || bg === 'clear') {
       app.cmp.opt.bg = bg;
     } else if (bg !== null) {
       app.cmp.opt.bg = hexToRgb(bg);
