@@ -5,5 +5,6 @@ window.app = {
   pmpm: {},
   models: {},
   router: {},
+  views: {},
   cmp: {} // Current mosaic parameters
 };
