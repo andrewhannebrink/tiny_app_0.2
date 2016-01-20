@@ -33,10 +33,8 @@ app.views = function () {
       'click #iconify': 'iconify',
     },
     iconify: function () {
-      var route = cmpToRoute('a/', app.cmp);
       console.log('inside iconify');
-      console.log(route);
-      app.router.navigate(route, {trigger: true, replace: true});
+      app.pmpm.makeMosaic(app.cmp);
     }
   });
 
