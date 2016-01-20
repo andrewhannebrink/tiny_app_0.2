@@ -17,7 +17,7 @@ app.router = function () {
     return [r, g, b];
   };
 
-  //
+  //TODO fix so that app.cmp.attributes.lib doesnt get assigned a value while app.cmp.attributes is still undefined (usually only on initial page load
   var updateCMP = function (lib, sz, bg) {
     app.cmp.attributes.lib = lib; 
     sz = sz.split('-');
