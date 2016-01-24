@@ -35,6 +35,18 @@ app.views = function () {
     });
   };
 
+  // Only control is clicking screen to hide subnav bar
+  var CanvasView = Backbone.View.extend({
+    el: '#canvasWrap',
+    events: {
+      'click #canvas': 'hideSubNav'
+    },
+    hideSubNav: function () {
+      $('screen clicked');
+      $('#subnav').hide();
+    }
+  });
+
   var NavBar = Backbone.View.extend({
     el: '#navtable',
     events: {
@@ -60,7 +72,9 @@ app.views = function () {
   });
 
   var navBar = new NavBar;
+  var canvasView = new CanvasView;
   
   that.navBar = navBar;
+  that.canvasView = canvasView;
   return that;
 }();
