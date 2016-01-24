@@ -27,14 +27,35 @@ app.views = function () {
     return pathStr;
   };
 
+  // Populates subnav bar with element from template.html (specified by id parameter)
+  var populateSubNav = function (id) {
+    $('#templates').load('template.html #' + id, function () {
+      var measurementsMenu = document.getElementById(id).innerHTML;
+      $("#subnav").html(measurementsMenu);
+    });
+  };
+
   var NavBar = Backbone.View.extend({
     el: '#navtable',
     events: {
-      'click #iconify': 'iconify',
+      'click #iconifyB': 'iconify',
+      'click #measurementsB': 'showMeasurements',
+      'click #libsB': 'showLibs'
     },
     iconify: function () {
       console.log('inside iconify');
+      $('#subnav').hide();
       app.pmpm.makeMosaic(app.cmp);
+    },
+    showMeasurements: function () {
+      console.log('show measurements btton');
+      populateSubNav('measurements');
+      $('#subnav').show();
+    },
+    showLibs: function () {
+      console.log('showing libs');
+      populateSubNav('libsMenu');
+      $('#subnav').show();
     }
   });
 
