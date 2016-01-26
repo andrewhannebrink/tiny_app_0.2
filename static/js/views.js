@@ -71,10 +71,28 @@ app.views = function () {
     }
   });
 
+  var SubNavBar = Backbone.View.extend({
+    el: '#subnav',
+    events: {
+      'change #tileSzSlider': 'changeTileSz',
+      'input #tileSzSlider': 'renderSzExample'
+    },
+    changeTileSz: function () {
+      console.log('tileSzChangede!');
+    },
+    renderSzExample: function () {
+      var sz = $('#tileSzSlider').val();
+      $('#tileSzExample').css({'width': sz + 'px', 'height': sz + 'px'}); 
+    }
+  });
+
   var navBar = new NavBar;
   var canvasView = new CanvasView;
+  var subNavBar = new SubNavBar;
   
   that.navBar = navBar;
   that.canvasView = canvasView;
+  that.subNavBar = subNavBar;
+
   return that;
 }();

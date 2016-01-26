@@ -1,12 +1,14 @@
 <div id="measurements">
   Adjust icon size:
+  <img id="tileSzExample" src="emoji/1f47e.png" />
+  <!--TODO: make slider handlebars template if I use more sliders eventually-->
   <table>
     <tr>
       <td> 
         <img class="but" src="emoji/2796.png" />
       </td> 
       <td> 
-        <input type="range"  min="10" max="100" />
+        <input id="tileSzSlider" type="range"  min="10" max="100" />
       </td> 
       <td> 
         <img class="but" src="emoji/2795.png" />
@@ -38,4 +40,8 @@
     </tr>
   </table>
 </div>
+
   
+<!--Holds representation of current mosaic parameters-->
+<div id="cmpView">
+</div>
