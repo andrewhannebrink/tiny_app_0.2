@@ -12,13 +12,13 @@ td {
   text-align:center;
 }
 
-canvas {
+#canvas {
   width: 100vw;
   height: 100vh;
   display: block;
 }
 
-select {
+#select {
   width: 300px;
   height: 300px;
   z-index: 100;
@@ -28,4 +28,28 @@ select {
 .but {
   width:40px;
   height:40px;
+}
+
+#navtable {
+  background-color: #181818;
+}
+
+#subnav {
+  background-color: #353535;
+}
+
+#subsubnav {
+  background-color: #4e4e4e;
+}
+
+.navtable_sel {
+  background-color: #353535;  
+}
+
+.subnav_sel {
+  background-color: #4e4e4e;
+}
+
+.subsubnav_sel {
+  background-color: #656565;
 }

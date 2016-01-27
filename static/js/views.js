@@ -47,30 +47,51 @@ app.views = function () {
       'click #canvas': 'hideSubNav'
     },
     hideSubNav: function () {
-      $('screen clicked');
       $('#subnav').hide();
+      $('td').removeClass('navtable_sel');
     }
   });
 
+  // Backbone view for bottom most navigation bar
   var NavBar = Backbone.View.extend({
     el: '#navtable',
     events: {
-      'click #iconifyB': 'iconify',
+      'click td': 'butClicked',
+      'click #saveB': 'save',
       'click #measurementsB': 'showMeasurements',
-      'click #libsB': 'showLibs'
+      'click #picB': 'pic',
+      'click #libsB': 'showLibs',
+      'click #iconifyB': 'iconify'
     },
-    iconify: function () {
-      console.log('inside iconify');
-      $('#subnav').hide();
-      app.pmpm.makeMosaic(app.cmp);
+    butClicked: function () {
+      console.log('butClicked');
+      $('td').removeClass('navtable_sel');
+    },
+    save: function () {
+      $('#subnav').hide(); //TODO take out this line
+      // TODO populate sub nav with form
+      $('#saveB').addClass('navtable_sel');
     },
     showMeasurements: function () {
       populateSubNav('measurements');
+      $('#measurementsB').addClass('navtable_sel');
       //TODO show measurements for x and y rather than base both dimensions off of x
+    },
+    pic: function () {
+      $('#subnav').hide(); //TODO take out this line
+      // TODO populate sub nav with form
+      $('#picB').addClass('navtable_sel');
     },
     showLibs: function () {
       console.log('showing libs');
       populateSubNav('libsMenu');
+      $('#libsB').addClass('navtable_sel');
+    },
+    iconify: function () {
+      console.log('inside iconify');
+      $('#subnav').hide();
+      $('#iconifyB').addClass('navtable_sel');
+      app.pmpm.makeMosaic(app.cmp);
     }
   });
 
