@@ -30,10 +30,13 @@ app.views = function () {
   // Populates subnav bar with element from template.html (specified by id parameter)
   var populateSubNav = function (id) {
     $('#templates').load('template.html #' + id, function () {
-      var measurementsMenu = document.getElementById(id).innerHTML;
-      $("#subnav").html(measurementsMenu);
-      $('#tileSzSlider').val(app.cmp.tileX);
-      subNavBar.renderSzExample();
+      var subMenu = document.getElementById(id).innerHTML;
+      $("#subnav").html(subMenu);
+      if (id === 'measurements') {
+        $('#tileSzSlider').val(app.cmp.tileX);
+        subNavBar.renderSzExample();
+      }
+      $('#subnav').show();
     });
   };
 
@@ -64,12 +67,10 @@ app.views = function () {
     showMeasurements: function () {
       populateSubNav('measurements');
       //TODO show measurements for x and y rather than base both dimensions off of x
-      $('#subnav').show();
     },
     showLibs: function () {
       console.log('showing libs');
       populateSubNav('libsMenu');
-      $('#subnav').show();
     }
   });
 
