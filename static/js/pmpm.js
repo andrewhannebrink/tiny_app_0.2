@@ -151,7 +151,7 @@ app.pmpm = function (spec) {
     var g = 0;
     var b = 0;
     var n = 0;
-    for (i = 0; i < pix.length; i += 4) {
+    for (i = 0; i < (pix.length - 4); i += 4*skip) {
       if (pix[i] === 0 && pix[i+1] === 0 && pix[i+2] === 0 && pix[i+3] === 0) {
         r += 255;
         g += 255;

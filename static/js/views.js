@@ -32,6 +32,8 @@ app.views = function () {
     $('#templates').load('template.html #' + id, function () {
       var measurementsMenu = document.getElementById(id).innerHTML;
       $("#subnav").html(measurementsMenu);
+      $('#tileSzSlider').val(app.cmp.tileX);
+      subNavBar.renderSzExample();
     });
   };
 
@@ -60,8 +62,8 @@ app.views = function () {
       app.pmpm.makeMosaic(app.cmp);
     },
     showMeasurements: function () {
-      console.log('show measurements btton');
       populateSubNav('measurements');
+      //TODO show measurements for x and y rather than base both dimensions off of x
       $('#subnav').show();
     },
     showLibs: function () {
@@ -78,7 +80,9 @@ app.views = function () {
       'input #tileSzSlider': 'renderSzExample'
     },
     changeTileSz: function () {
-      console.log('tileSzChangede!');
+      var sz = $('#tileSzSlider').val();
+      app.cmp.tileX = sz;
+      app.cmp.tileY = sz;
     },
     renderSzExample: function () {
       var sz = $('#tileSzSlider').val();
