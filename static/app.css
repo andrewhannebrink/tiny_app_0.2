@@ -4,16 +4,19 @@ body {
 }
 
 table {
+  font-size: 11px;
   height:64px;
   width: 100%;
   max-width: 320px;
 }
-.navbar-inverse {
-  color: white;
+.navbar {
+  color: black;
   font-family: monospace;
+  border-color: #ff276c;
+  background:#ff276c;
 }
 td {
-  font-size: 8px;
+  font-size: 9px;
   text-align:center;
 }
 div {
@@ -38,31 +41,31 @@ div {
 }
 
 #navtable {
-  background-color: #181818;
+  background-color: #ffffff;
 }
 
 #subnav {
-  background-color: #353535;
+  background-color: #ffaec8;
 }
 
 .subsubnav {
-  background-color: #4e4e4e;
+  background-color: #ff6c9b;
 }
 
 .navtable_sel {
-  background-color: #353535;  
+  background-color: #ffaec8;  
 }
 
 .subnav_sel {
-  background-color: #4e4e4e;
+  background-color: #ff6c9b;
 }
 
 .subsubnav_sel {
-  background-color: #656565;
+  background-color: #ff276c;
 }
 
 .special_sel {
-  background-color: #caca45;
+  background-color: #27f3d4;
 }
 
 div.upload {
