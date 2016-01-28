@@ -98,6 +98,7 @@ app.views = function () {
   // TODO split into two different views for measurements and libs buttons
   var SubNavBar = Backbone.View.extend({
     el: '#subnav',
+    currentLibBase: 'emoji',
     events: {
       'change #tileSzSlider': 'changeTileSz',
       'input #tileSzSlider': 'renderSzExample',
@@ -107,7 +108,8 @@ app.views = function () {
       'click .subsubnavcell': 'subsubButClicked',
       'click #clearB': 'clear',
       'click #colorsB': 'colors',
-      'click #colorB': 'color'
+      'click #colorB': 'color',
+      'click #randomB': 'random'
     },
     changeTileSz: function () {
       var sz = $('#tileSzSlider').val();
@@ -129,19 +131,34 @@ app.views = function () {
     emojiLib: function () {
       //TODO identify current cmp background parameter for emojiLib and auto select subsubnav background selection
       $('#emojiLibB').addClass('subnav_sel');
+      $('#colorsB').removeClass('special_sel');
+      this.currentLibBase = 'emoji';
+      app.cmp.attributes.lib = this.currentLibBase;
     },
     winLib: function () {
       //TODO identify current cmp background parameter for winLibB and auto select subsubnav background selection
       $('#winLibB').addClass('subnav_sel');
+      $('#colorsB').removeClass('special_sel');
+      this.currentLibBase = 'win';
+      app.cmp.attributes.lib = this.currentLibBase;
     },
     clear: function () {
       $('#clearB').addClass('subsubnav_sel');
+      app.cmp.opt.bg = 'clear';
     },
     colors: function () {
-      $('#colorsB').addClass('subsubnav_sel');
+      $('#colorsB').addClass('special_sel');
+      app.cmp.attributes.lib = this.currentLibBase + '-1';
+      app.cmp.opt.bg = undefined;
     },
     color: function () {
       $('#colorB').addClass('subsubnav_sel');
+      // TODO dynamic color selection
+      app.cmp.opt.bg = [255, 255, 255];
+    },
+    random: function () {
+      $('#randomB').addClass('subsubnav_sel');
+      app.cmp.opt.bg = 'random';
     }
   });
 
