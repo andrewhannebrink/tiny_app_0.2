@@ -21,7 +21,7 @@
       <td> 
     </tr>
   </table>
-  -> icon size ^^^
+  -> icon size ^
 </div>
 
 <!--TODO: make this a handlebars template that iterates over libs-->
@@ -30,42 +30,60 @@
     <table>
       <tr>
         <td id="clearB" class="subsubnavcell">
-          <img class="but" src="pics/transparent.png" />
+          <div><img class="but" src="pics/transparent.png" /></div>
+          clear 
         </td>
+        <!--TODO change colorsB to pixelatedB-->
         <td id="colorsB" class="subsubnavcell">
-          <img class="but" src="pics/pixelated.png" />
+          <div><img class="but" src="pics/pixelated.png" /></div>
+          pixelated
         </td>
         <td id="colorB" class="subsubnavcell">
           <div class="but" style="background-color:white;"></div>
+          solid 
         </td>
         <td id="randomB" class="subsubnavcell">
-          <img class="but" src="pics/random.png" />
+          <div><img class="but" src="pics/random.png" /></div>
+          random 
         </td>
       </tr>
     </table>
-    -> icon background styles ^^^
+    -> background styles ^
   </div>
 
   <table>
     <tr>
       <td id="emojiLibB" class="subnavcell">
-        <img class="but" src="emoji/1f60e.png" />
+        <div><img class="but" src="emoji/1f60e.png" /></div>
+        emoji
       </td>
       <td id="winLibB" class="subnavcell">
-        <img class="but" src="win/nwnp32_605.png" />
+        <div><img class="but" src="win/nwnp32_605.png" /></div>
+        windows
       </td>
       <td id="pokeLibB" class="subnavcell">
-        <img class="but" src="poke/130 Gyarados.png" />
+        <div><img class="but" src="poke/130 Gyarados.png" /></div>
+        pokemon
       </td>
       <td id="andLibB" class="subnavcell">
-        <img class="but" src="and/Drive.png" />
+        <div><img class="but" src="and/Drive.png" /></div>
+        android 
       </td>
       <td id="sailorLibB" class="subnavcell">
-        <img class="but" src="sailor/Artemis.png" />
+        <div><img class="but" src="sailor/Artemis.png" /></div>
+        slr moon 
       </td>
     </tr>
   </table>
-  -> icon sets ^^^
+  -> icon sets ^
+
+</div>
+
+  
+<!--Holds representation of current mosaic parameters-->
+<div id="cmpView">
+  <canvas></canvas>
+</div>
 
 </div>
 
