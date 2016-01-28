@@ -304,7 +304,7 @@ app.pmpm = function (spec) {
           console.log('matched lib');
           arr = [];
           lib = libs[keys[i]];
-          key = dir + '-' + keys.length;
+          key = dir + '-1';
           for (j = 0; j < lib.icons.length; j += 1) {
             arr.push(lib.icons[j].path.split('/')[1]);
           }

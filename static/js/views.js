@@ -10,6 +10,14 @@ app.views = function () {
     return hex;
   };
 
+  // Loads lib from json using pmpm.loadLib if app.pmpm.libs doen't already contain it
+  var loadLibIfNot = function (lib) {
+    if ( !app.pmpm.libs.hasOwnProperty(lib) ) {
+      app.pmpm.loadSelect(app.cmp, lib, {});
+    }
+  };
+
+
   // Concats pathStr with processed app.cmp parameters to make route
   var cmpToRoute = function (pathStr, cmp) {
     pathStr += cmp.attributes.lib + '/';
@@ -105,6 +113,9 @@ app.views = function () {
       'click .subnavcell': 'subButClicked',
       'click #emojiLibB': 'emojiLib',
       'click #winLibB': 'winLib',
+      'click #pokeLibB': 'pokeLib',
+      'click #andLibB': 'andLib',
+      'click #sailorLibB': 'sailorLib',
       'click .subsubnavcell': 'subsubButClicked',
       'click #clearB': 'clear',
       'click #colorsB': 'colors',
@@ -129,18 +140,19 @@ app.views = function () {
       $('.subsubnavcell').removeClass('subsubnav_sel');
     },
     emojiLib: function () {
-      //TODO identify current cmp background parameter for emojiLib and auto select subsubnav background selection
-      $('#emojiLibB').addClass('subnav_sel');
-      $('#colorsB').removeClass('special_sel');
-      this.currentLibBase = 'emoji';
-      app.cmp.attributes.lib = this.currentLibBase;
+      this.changeLib('emoji');
     },
     winLib: function () {
-      //TODO identify current cmp background parameter for winLibB and auto select subsubnav background selection
-      $('#winLibB').addClass('subnav_sel');
-      $('#colorsB').removeClass('special_sel');
-      this.currentLibBase = 'win';
-      app.cmp.attributes.lib = this.currentLibBase;
+      this.changeLib('win');
+    },
+    pokeLib: function () {
+      this.changeLib('poke');
+    },
+    andLib: function () {
+      this.changeLib('and');
+    },
+    sailorLib: function () {
+      this.changeLib('sailor');
     },
     clear: function () {
       $('#clearB').addClass('subsubnav_sel');
@@ -159,6 +171,13 @@ app.views = function () {
     random: function () {
       $('#randomB').addClass('subsubnav_sel');
       app.cmp.opt.bg = 'random';
+    },
+    changeLib: function (lib) {
+      $('#' + lib + 'LibB').addClass('subnav_sel');
+      $('#colorsB').removeClass('special_sel');
+      loadLibIfNot(lib);
+      this.currentLibBase = lib;
+      app.cmp.attributes.lib = this.currentLibBase;
     }
   });
 
