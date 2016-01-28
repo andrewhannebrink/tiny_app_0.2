@@ -64,3 +64,18 @@ div {
 .special_sel {
   background-color: #caca45;
 }
+
+div.upload {
+  background: url(emoji/1f4f7.png) no-repeat;
+  background-size: 40px 40px;
+  background-position:center;
+  overflow:hidden;
+}
+
+div.upload input {
+  display: block !important;
+  width: 40px !important;
+  height: 40px !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+}
