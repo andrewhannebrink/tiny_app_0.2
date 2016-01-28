@@ -280,10 +280,12 @@ app.pmpm = function (spec) {
   // Either adds to libs from json if libs is empty, or adds a lib to libs 
   var loadLib = function (cmp, context, dir, iconSz, filters, write) {
     var jsonPath = dir + '/' + dir + '.json';
+    console.log(jsonPath);
     var keys, i, j, arr, lib, key;
-    if (Object.keys(libs).length === 0) {
+    if ( !libs.hasOwnProperty(dir) ) {
       loadJSON(jsonPath, function (res) {
         console.log('initializing libs from json');
+        console.log(res);
         if (res.hasOwnProperty(dir)) {
           // Case where json comes preloaded with each image's avg color
           libsFromJSON(cmp, res);
@@ -329,7 +331,6 @@ app.pmpm = function (spec) {
   that.crop = crop;
   that.getClosest = getClosest;
   that.makeMosaic = makeMosaic;
-  //that.cmp = cmp; //TODO move this to backbone model
   that.loadLib = loadLib;
   that.loadSelect = loadSelect;
   that.retContext = retContext;

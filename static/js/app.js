@@ -19,7 +19,7 @@
     imageObj.onload = function() {
       app.cmp = new app.models.MosaicParams({lib: 'emoji'});
       context.drawImage(this, 0, 0, w, h);
-      app.pmpm.loadSelect(app.cmp, 'emoji', {});
+      app.pmpm.loadSelect(app.cmp, 'win', {});
     };
     imageObj.src = dataURL;
   };
