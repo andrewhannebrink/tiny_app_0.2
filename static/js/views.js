@@ -56,7 +56,7 @@ app.views = function () {
   var NavBar = Backbone.View.extend({
     el: '#navtable',
     events: {
-      'click td': 'butClicked',
+      'click .navcell': 'butClicked',
       'click #saveB': 'save',
       'click #measurementsB': 'showMeasurements',
       'click #picB': 'pic',
@@ -65,7 +65,7 @@ app.views = function () {
     },
     butClicked: function () {
       console.log('butClicked');
-      $('td').removeClass('navtable_sel');
+      $('.navcell').removeClass('navtable_sel');
     },
     save: function () {
       $('#subnav').hide(); //TODO take out this line
@@ -94,12 +94,20 @@ app.views = function () {
       app.pmpm.makeMosaic(app.cmp);
     }
   });
-
+  
+  // TODO split into two different views for measurements and libs buttons
   var SubNavBar = Backbone.View.extend({
     el: '#subnav',
     events: {
       'change #tileSzSlider': 'changeTileSz',
-      'input #tileSzSlider': 'renderSzExample'
+      'input #tileSzSlider': 'renderSzExample',
+      'click .subnavcell': 'subButClicked',
+      'click #emojiLibB': 'emojiLib',
+      'click #winLibB': 'winLib',
+      'click .subsubnavcell': 'subsubButClicked',
+      'click #clearB': 'clear',
+      'click #colorsB': 'colors',
+      'click #colorB': 'color'
     },
     changeTileSz: function () {
       var sz = $('#tileSzSlider').val();
@@ -109,6 +117,31 @@ app.views = function () {
     renderSzExample: function () {
       var sz = $('#tileSzSlider').val();
       $('#tileSzExample').css({'width': sz + 'px', 'height': sz + 'px'}); 
+    },
+    subButClicked: function () {
+      console.log('subButClicked');
+      $('.subnavcell').removeClass('subnav_sel');
+    },
+    subsubButClicked: function () {
+      console.log('subsubButClicked');
+      $('.subsubnavcell').removeClass('subsubnav_sel');
+    },
+    emojiLib: function () {
+      //TODO identify current cmp background parameter for emojiLib and auto select subsubnav background selection
+      $('#emojiLibB').addClass('subnav_sel');
+    },
+    winLib: function () {
+      //TODO identify current cmp background parameter for winLibB and auto select subsubnav background selection
+      $('#winLibB').addClass('subnav_sel');
+    },
+    clear: function () {
+      $('#clearB').addClass('subsubnav_sel');
+    },
+    colors: function () {
+      $('#colorsB').addClass('subsubnav_sel');
+    },
+    color: function () {
+      $('#colorB').addClass('subsubnav_sel');
     }
   });
 
