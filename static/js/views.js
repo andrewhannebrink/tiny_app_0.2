@@ -68,6 +68,7 @@ app.views = function () {
       'click #saveB': 'save',
       'click #measurementsB': 'showMeasurements',
       'click #picB': 'pic',
+      'change #imageLoader': 'upload',
       'click #libsB': 'showLibs',
       'click #iconifyB': 'iconify'
     },
@@ -86,9 +87,24 @@ app.views = function () {
       //TODO show measurements for x and y rather than base both dimensions off of x
     },
     pic: function () {
-      $('#subnav').hide(); //TODO take out this line
-      // TODO populate sub nav with form
+      $('#subnav').hide();
       $('#picB').addClass('navtable_sel');
+    },
+    upload: function (e) {
+      console.log('in upload function');
+      var reader = new FileReader();
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext('2d');
+      reader.onload = function(event){
+        console.log('reader loaded');
+        var img = new Image();
+        img.onload = function(){
+        console.log('img loaded');
+          ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        }
+        img.src = event.target.result;
+      }
+      reader.readAsDataURL(e.target.files[0]);
     },
     showLibs: function () {
       console.log('showing libs');
