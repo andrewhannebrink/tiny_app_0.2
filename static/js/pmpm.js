@@ -33,7 +33,7 @@ app.pmpm = function (spec) {
     for (var lib in res) {
       if (res.hasOwnProperty(lib)) {
         libs[lib] = res[lib];
-        cmp.initialize({lib: lib});    
+        cmp.set({lib: lib});    
         makeMosaic(cmp); //TODO dont always run makeMosaic() after loading libs from json
       }
     }
@@ -74,7 +74,7 @@ app.pmpm = function (spec) {
           };
           if (filters.hasOwnProperty('backgrounds')) {
             if (filters.backgrounds === 'random') {
-              cropImgParams.opt.bg = 'random';
+              cropImgParams.attributes.bg = 'random';
             }
           }
           crop(cropImgParams, cmp);
@@ -127,7 +127,7 @@ app.pmpm = function (spec) {
     colParams.mode = 'color';
     colParams.path = avg;
     colParams.x += p.w;
-    colParams.opt.bg = undefined;
+    colParams.attributes.bg = undefined;
     iconObj.path = p.path;
     iconObj.avg = avg;
     libs[p.key].icons.push(iconObj);
@@ -137,7 +137,7 @@ app.pmpm = function (spec) {
       libs[p.key].complete = true;
       console.log('loaded lib ' + p.key + ' (' + libs[p.key].icons.length + ' total images)');
       //console.log(JSON.stringify(libs)); // TODO take out stringify from here
-      cmp.initialize({lib: p.key});
+      cmp.set({lib: p.key});
       makeMosaic(cmp); //TODO dont run makeMosaic everytime after populated 'select' canvas
     }
   };
@@ -242,33 +242,33 @@ app.pmpm = function (spec) {
     var pix = imgd.data;
     var xt = Math.floor(p.w * p.scale);
     var yt = Math.floor(p.h * p.scale);
-    var totXImg = Math.floor(xt / p.tileX);
-    var totYImg = Math.floor(yt / p.tileY);
-    var extraXPix = xt - (totXImg * p.tileX);
-    var extraYPix = yt - (totYImg * p.tileY);
+    var totXImg = Math.floor(xt / p.attributes.tileX);
+    var totYImg = Math.floor(yt / p.attributes.tileY);
+    var extraXPix = xt - (totXImg * p.attributes.tileX);
+    var extraYPix = yt - (totYImg * p.attributes.tileY);
     var xBuf = Math.floor(extraXPix / 2); 
     var yBuf = Math.floor(extraYPix / 2); 
     var xi, yi, rgba, np, obj, cropParams, x, y, avg; 
     for (yi = 0; yi < totYImg; yi += 1) {
       for (xi = 0; xi < totXImg; xi += 1) {
-        x = xBuf + p.tileX * xi;
-        y = yBuf + p.tileY * yi;
-        avg = getAvgRGB(p.context, 5, x, y, p.tileX, p.tileY);
+        x = xBuf + p.attributes.tileX * xi;
+        y = yBuf + p.attributes.tileY * yi;
+        avg = getAvgRGB(p.context, 5, x, y, p.attributes.tileX, p.attributes.tileY);
         obj = getClosest(libs[p.attributes.lib].icons, avg);
         cropParams = {
           mode: 'image',
           path: obj.path,
           context: p.context,
-          x: xBuf + p.tileX*xi,
-          y: yBuf + p.tileY*yi,
-          w: p.tileX,
-          h: p.tileY,
+          x: xBuf + p.attributes.tileX*xi,
+          y: yBuf + p.attributes.tileY*yi,
+          w: p.attributes.tileX,
+          h: p.attributes.tileY,
           opt: {
-            bg: p.opt.bg
+            bg: p.attributes.bg
           },
         };
         if (typeof obj.bg !== 'undefined') {
-          if (typeof p.opt.bg === 'undefined') {
+          if (typeof p.attributes.bg === 'undefined') {
             cropParams.opt.bg = obj.bg;
           }
         }

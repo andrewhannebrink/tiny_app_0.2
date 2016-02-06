@@ -21,16 +21,16 @@ app.views = function () {
   // Concats pathStr with processed app.cmp parameters to make route
   var cmpToRoute = function (pathStr, cmp) {
     pathStr += cmp.attributes.lib + '/';
-    if (cmp.tileX === cmp.tileY) {
-      pathStr += cmp.tileX;
+    if (cmp.attributes.tileX === cmp.attributes.tileY) {
+      pathStr += cmp.attributes.tileX;
     } else {
-      pathStr += cmp.tileX + '-';
-      pathStr += cmp.tileY;
+      pathStr += cmp.attributes.tileX + '-';
+      pathStr += cmp.attributes.tileY;
     }
-    if (cmp.opt.bg === 'clear' || cmp.opt.bg === 'random') {
-      pathStr += '/' + cmp.opt.bg;
-    } else if (typeof cmp.opt.bg !== 'undefined') {
-      pathStr += '/' + toHexStr(cmp.opt.bg);
+    if (cmp.attributes.bg === 'clear' || cmp.attributes.bg === 'random') {
+      pathStr += '/' + cmp.attributes.bg;
+    } else if (typeof cmp.attributes.bg !== 'undefined') {
+      pathStr += '/' + toHexStr(cmp.attributes.bg);
     }
     return pathStr;
   };
@@ -39,10 +39,13 @@ app.views = function () {
   var populateSubNav = function (id) {
     $('#templates').load('template.html #' + id, function () {
       var subMenu = document.getElementById(id).innerHTML;
+      var libStr;
       $("#subnav").html(subMenu);
       if (id === 'measurements') {
-        $('#tileSzSlider').val(app.cmp.tileX);
+        $('#tileSzSlider').val(app.cmp.attributes.tileX);
         subNavBar.renderSzExample();
+      } else if (id === 'libsMenu') {
+        that.subNavBar.changeLib(app.cmp.attributes.lib, app.cmp.attributes.bg);
       }
       $('#subnav').show();
     });
@@ -140,8 +143,9 @@ app.views = function () {
     },
     changeTileSz: function () {
       var sz = $('#tileSzSlider').val();
-      app.cmp.tileX = sz;
-      app.cmp.tileY = sz;
+      // Don't call set twice as to not fire a change event twice
+      app.cmp.set({tileX: sz});
+      app.cmp.attributes.tileY = sz;
     },
     renderSzExample: function () {
       var sz = $('#tileSzSlider').val();
@@ -156,44 +160,62 @@ app.views = function () {
       $('.subsubnavcell').removeClass('subsubnav_sel');
     },
     emojiLib: function () {
-      this.changeLib('emoji');
+      this.changeLib('emoji', undefined);
     },
     winLib: function () {
-      this.changeLib('win');
+      this.changeLib('win', undefined);
     },
     pokeLib: function () {
-      this.changeLib('poke');
+      this.changeLib('poke', undefined);
     },
     andLib: function () {
-      this.changeLib('and');
+      this.changeLib('and', undefined);
     },
     sailorLib: function () {
       this.changeLib('sailor');
     },
     clear: function () {
       $('#clearB').addClass('subsubnav_sel');
-      app.cmp.opt.bg = 'clear';
+      app.cmp.set({bg: 'clear'});
     },
     colors: function () {
+      var libStr = this.currentLibBase + '-1';
       $('#colorsB').addClass('special_sel');
-      app.cmp.attributes.lib = this.currentLibBase + '-1';
-      app.cmp.opt.bg = undefined;
+      app.cmp.set({lib: libStr});
+      app.cmp.set({bg: undefined});
     },
     color: function () {
       $('#colorB').addClass('subsubnav_sel');
       // TODO dynamic color selection
-      app.cmp.opt.bg = [255, 255, 255];
+      app.cmp.set({bg: [255, 255, 255]});
     },
     random: function () {
       $('#randomB').addClass('subsubnav_sel');
-      app.cmp.opt.bg = 'random';
+      app.cmp.set({bg: 'random'});
     },
-    changeLib: function (lib) {
-      $('#' + lib + 'LibB').addClass('subnav_sel');
-      $('#colorsB').removeClass('special_sel');
+    changeLib: function (lib, bg) {
+      var libStr = lib.split('-')[0]
+      $('#' + libStr + 'LibB').addClass('subnav_sel');
+      if (lib.slice(-2) !== '-1') {
+        $('#colorsB').removeClass('special_sel');
+      } else {
+        $('#colorsB').addClass('special_sel');
+      }
       loadLibIfNot(lib);
-      this.currentLibBase = lib;
-      app.cmp.attributes.lib = this.currentLibBase;
+      this.currentLibBase = libStr;
+      app.cmp.set({lib: lib});
+      if (bg === 'clear') {
+        this.clear();
+      } else if (bg === 'random') {
+        this.random();
+      } else if (Array.isArray(bg) === true) {
+        this.color();
+      } else if (typeof bg === 'undefined') {
+        app.cmp.set({bg: bg});
+        $('.subsubnavcell').removeClass('subsubnav_sel');
+      } else {
+        throw 'not valid inpute for bg';
+      }
     }
   });
 

@@ -18,6 +18,11 @@
     var imageObj = new Image();
     imageObj.onload = function() {
       app.cmp = new app.models.MosaicParams({lib: 'emoji'});
+      _.extend(app.cmp, Backbone.Events);
+      app.cmp.on('change', function () {
+        app.views.subNavBar.changeLib(app.cmp.attributes.lib, app.cmp.attributes.bg);
+        console.log('app.cmp CHNAGED!!!1!');
+      });
       context.drawImage(this, 0, 0, w, h);
       app.pmpm.loadSelect(app.cmp, 'emoji', {});
     };

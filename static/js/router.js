@@ -19,21 +19,23 @@ app.router = function () {
 
   //TODO fix so that app.cmp.attributes.lib doesnt get assigned a value while app.cmp.attributes is still undefined (usually only on initial page load
   var updateCMP = function (lib, sz, bg) {
+    var rgbBg;
     app.cmp.attributes.lib = lib; 
     sz = sz.split('-');
     if (sz.length === 1) {
-      app.cmp.tileX = sz[0]; 
-      app.cmp.tileY = sz[0]; 
+      app.cmp.attributes.tileX = sz[0]; 
+      app.cmp.attributes.tileY = sz[0]; 
     } else {
-      app.cmp.tileX = sz[0]; 
-      app.cmp.tileY = sz[1]; 
+      app.cmp.attributes.tileX = sz[0]; 
+      app.cmp.attributes.tileY = sz[1]; 
     }
     if (bg === 'random' || bg === 'clear') {
-      app.cmp.opt.bg = bg;
+      app.cmp.set({bg: bg});
     } else if (bg !== null) {
-      app.cmp.opt.bg = hexToRgb(bg);
+      rgbBg = hexToRgb(bg);
+      app.cmp.set({bg: rgbBg});
     } else {
-      app.cmp.opt.bg = undefined;
+      app.cmp.set({bg: undefined});
     }
   };
   

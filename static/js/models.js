@@ -5,11 +5,8 @@ app.models = function () {
   var MosaicParams = Backbone.Model.extend({
     // Resets mosaicParams, called when new lib is loaded
     initialize: function (attributes) {
-      var tileSz;
       if (typeof attributes.tileSz === 'undefined') {
-        tileSz = 16;
-      } else {
-        tileSz = attributes.tileSz;
+        this.attributes.tileSz = 16;
       }
       //TODO get context somehow else (pass as param maybe?)
       var canv = document.getElementById('canvas');
@@ -19,12 +16,10 @@ app.models = function () {
       this.context = canvCtx;
       this.scale = 1;
       this.skip = 5;
-      this.tileX = tileSz;
-      this.tileY = tileSz;
+      this.attributes.tileX = this.attributes.tileSz;
+      this.attributes.tileY = this.attributes.tileSz;
       this.attributes.lib = attributes.lib;
-      this.opt = {
-        bg: undefined
-      };
+      this.attributes.bg = undefined;
     }
   });
 
