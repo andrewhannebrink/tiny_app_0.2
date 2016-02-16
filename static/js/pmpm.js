@@ -74,7 +74,7 @@ app.pmpm = function (spec) {
           };
           if (filters.hasOwnProperty('backgrounds')) {
             if (filters.backgrounds === 'random') {
-              cropImgParams.attributes.bg = 'random';
+              cropImgParams.opt.bg = 'random';
             }
           }
           crop(cropImgParams, cmp);
@@ -127,7 +127,7 @@ app.pmpm = function (spec) {
     colParams.mode = 'color';
     colParams.path = avg;
     colParams.x += p.w;
-    colParams.attributes.bg = undefined;
+    colParams.opt.bg = undefined;
     iconObj.path = p.path;
     iconObj.avg = avg;
     libs[p.key].icons.push(iconObj);
