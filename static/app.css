@@ -42,6 +42,9 @@ div {
   position: fixed;
   top: 100px;
   left: 100px;
+  border-style: solid;
+  border-color: #00ffff;
+  border-width: 8px;
 }
 
 .but {
