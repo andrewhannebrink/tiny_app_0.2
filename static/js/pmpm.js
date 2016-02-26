@@ -33,7 +33,8 @@ app.pmpm = function (spec) {
       if (res.hasOwnProperty(lib)) {
         libs[lib] = res[lib];
         cmp.set({lib: lib});    
-        makeMosaic(cmp); //TODO dont always run makeMosaic() after loading libs from json
+        app.previewImgObj.src = 'preview.png';
+        //makeMosaic(cmp); //TODO dont always run makeMosaic() after loading libs from json
       }
     }
   };
