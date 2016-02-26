@@ -8,9 +8,8 @@ This durable module follows the functional modular inheritance pattern, as speci
 // TODO implement spec
 app.pmpm = function (spec) {
 
-  var that = {};
-
-  var libs = {};
+  var that = {},
+      libs = {};
 
   // Initializes empty lib object to be added to libs
   var makeEmptyLib = function (tot) {
@@ -24,13 +23,13 @@ app.pmpm = function (spec) {
   // Gets the context from a canvas id string
   var retContext = function(canvasId) {
     var canvas = document.getElementById(canvasId);
-    var context = canvas.getContext('2d');
-    return context;
+    return canvas.getContext('2d');
   };
 
   // Reads libs from json and adds them to the 'libs' object
   var libsFromJSON = function (cmp, res) {
-    for (var lib in res) {
+    var lib;
+    for (lib in res) {
       if (res.hasOwnProperty(lib)) {
         libs[lib] = res[lib];
         cmp.set({lib: lib});    
@@ -41,12 +40,12 @@ app.pmpm = function (spec) {
 
   // Populates select canvas and calculates average rgbs
   var populateSelect = function (cmp, res, dir, key, iconSz, filters, write, context) {
-    var img, avg, imgPath, cropImgParams;
-    var w = context.canvas.width;
-    var h = context.canvas.height;
-    var yPos = 0;
-    var xPos = 0;
-    var i = 0;
+    var img, avg, imgPath, cropImgParams,
+        w = context.canvas.width,
+        h = context.canvas.height,
+        yPos = 0,
+        xPos = 0,
+        i = 0;
     while (yPos + iconSz < h) {
       while (xPos + 2*iconSz < w) {
         // prevents 8000/emoji/domain 404 not found error
@@ -122,8 +121,8 @@ app.pmpm = function (spec) {
   // Crops a swab of the average color to the right of the cropped image defined in p
   // Also builds iconObj in preparation to be added to pmpm.libs
   var cropSwab = function (cmp, p, iconObj) {
-    var avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h);
-    var colParams = Object.create(p);
+    var avg = getAvgRGB(p.context, 5, p.x, p.y, p.w, p.h),
+        colParams = Object.create(p);
     colParams.mode = 'color';
     colParams.path = avg;
     colParams.x += p.w;
@@ -144,13 +143,13 @@ app.pmpm = function (spec) {
 
   // Return avg rgb in a region
   var getAvgRGB = function (context, skip, x, y, w, h) {
-    var imgd = context.getImageData(x, y, w, h);
-    var pix = imgd.data;
-    var i, avg;
-    var r = 0;
-    var g = 0;
-    var b = 0;
-    var n = 0;
+    var imgd = context.getImageData(x, y, w, h),
+        pix = imgd.data,
+        i, avg,
+        r = 0,
+        g = 0,
+        b = 0,
+        n = 0;
     for (i = 0; i < (pix.length - 4); i += 4*skip) {
       if (pix[i] === 0 && pix[i+1] === 0 && pix[i+2] === 0 && pix[i+3] === 0) {
         r += 255;
@@ -221,11 +220,11 @@ app.pmpm = function (spec) {
 
   // function for finding closest images and returning details about it, bg param is optional
   var getClosest = function(lib, avg) {
-    var closest = {
-      path: '',
-      dis: 256 * 256 * 256
-    };
-    var i, d;
+    var i, d, 
+        closest = {
+          path: '',
+          dis: 256 * 256 * 256
+        };
     for (i = 0; i < lib.length; i += 1) {
       d = distance(lib[i].avg, avg);
       if (d < closest.dis) {
@@ -238,17 +237,17 @@ app.pmpm = function (spec) {
   };
 
   var makeMosaic = function(p) {
-    var imgd = p.context.getImageData(0, 0, p.w, p.h);
-    var pix = imgd.data;
-    var xt = Math.floor(p.w * p.scale);
-    var yt = Math.floor(p.h * p.scale);
-    var totXImg = Math.floor(xt / p.attributes.tileX);
-    var totYImg = Math.floor(yt / p.attributes.tileY);
-    var extraXPix = xt - (totXImg * p.attributes.tileX);
-    var extraYPix = yt - (totYImg * p.attributes.tileY);
-    var xBuf = Math.floor(extraXPix / 2); 
-    var yBuf = Math.floor(extraYPix / 2); 
-    var xi, yi, rgba, np, obj, cropParams, x, y, avg; 
+    var imgd = p.context.getImageData(0, 0, p.w, p.h),
+        pix = imgd.data,
+        xt = Math.floor(p.w * p.scale),
+        yt = Math.floor(p.h * p.scale),
+        totXImg = Math.floor(xt / p.attributes.tileX),
+        totYImg = Math.floor(yt / p.attributes.tileY),
+        extraXPix = xt - (totXImg * p.attributes.tileX),
+        extraYPix = yt - (totYImg * p.attributes.tileY),
+        xBuf = Math.floor(extraXPix / 2),
+        yBuf = Math.floor(extraYPix / 2), 
+        xi, yi, rgba, np, obj, cropParams, x, y, avg;
     for (yi = 0; yi < totYImg; yi += 1) {
       for (xi = 0; xi < totXImg; xi += 1) {
         x = xBuf + p.attributes.tileX * xi;
@@ -279,9 +278,9 @@ app.pmpm = function (spec) {
 
   // Either adds to libs from json if libs is empty, or adds a lib to libs 
   var loadLib = function (cmp, context, dir, iconSz, filters, write) {
-    var jsonPath = dir + '/' + dir + '.json';
+    var jsonPath = dir + '/' + dir + '.json',
+        keys, i, j, arr, lib, key;
     console.log(jsonPath);
-    var keys, i, j, arr, lib, key;
     if ( !libs.hasOwnProperty(dir) ) {
       loadJSON(jsonPath, function (res) {
         console.log('initializing libs from json');

@@ -103,7 +103,7 @@ app.views = function () {
         var img = new Image();
         img.onload = function(){
         console.log('img loaded');
-          ctx.drawImage(img,0,0,canvas.width,canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
         img.src = event.target.result;
       }
@@ -144,8 +144,7 @@ app.views = function () {
     changeTileSz: function () {
       var sz = $('#tileSzSlider').val();
       // Don't call set twice as to not fire a change event twice
-      app.cmp.set({tileX: sz});
-      app.cmp.attributes.tileY = sz;
+      app.cmp.set({tileX: sz, tileY: sz});
     },
     renderSzExample: function () {
       var sz = $('#tileSzSlider').val();
@@ -216,6 +215,9 @@ app.views = function () {
       } else {
         throw 'not valid inpute for bg';
       }
+      previewMosaicParams = Object.create(app.cmp);
+      previewMosaicParams.context = app.previewCtx;
+      app.pmpm.makeMosaic(previewMosaicParams);
     }
   });
 

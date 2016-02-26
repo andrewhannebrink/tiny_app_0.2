@@ -35,6 +35,15 @@ div {
   position: static;
 }
 
+#preview {
+  width: 200px;
+  height: 200px;
+  z-index: 200;
+  position: fixed;
+  top: 100px;
+  left: 100px;
+}
+
 .but {
   width:40px;
   height:40px;
@@ -45,27 +54,27 @@ div {
 }
 
 #subnav {
-  background-color: #ffaec8;
+  background-color: #b7f4f4;
 }
 
 .subsubnav {
-  background-color: #ff6c9b;
+  background-color: #00ffff;
 }
 
 .navtable_sel {
-  background-color: #ffaec8;  
+  background-color: #b7f4f4;  
 }
 
 .subnav_sel {
-  background-color: #ff6c9b;
+  background-color: #00ffff;
 }
 
 .subsubnav_sel {
-  background-color: #ff276c;
+  background-color: #008888;
 }
 
 .special_sel {
-  background-color: #27f3d4;
+  background-color: #ffef32;
 }
 
 div.upload {
