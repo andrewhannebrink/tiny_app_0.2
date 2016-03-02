@@ -4,10 +4,14 @@ body {
 }
 
 table {
+  background-color:white;
   font-size: 11px;
   height:64px;
   width: 100%;
   max-width: 320px;
+}
+#main-nav {
+  background-color: #ffffff;
 }
 .navbar {
   color: black;
@@ -17,7 +21,7 @@ table {
 }
 td {
   font-size: 9px;
-  text-align:center;
+  text-align: center;
 }
 div {
   margin: 0 auto;
@@ -27,24 +31,17 @@ div {
   height: 100vh;
   display: block;
 }
-
 #select {
   width: 100vw;
   height: 100vh;
   z-index: 100;
   position: static;
 }
-
 #preview {
   width: 200px;
   height: 200px;
   z-index: 200;
-  position: fixed;
-  top: 100px;
-  left: 100px;
-  border-style: solid;
-  border-color: #00ffff;
-  border-width: 8px;
+  border: 6px solid #00ffff;
 }
 
 .but {
@@ -52,8 +49,16 @@ div {
   height:40px;
 }
 
+#previewdiv {
+  width: 200px;
+}
+
+.white {
+  background-color: white;
+}
+
 #navtable {
-  background-color: #ffffff;
+  background-color: transparent;
 }
 
 #subnav {

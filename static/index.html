@@ -13,40 +13,45 @@
 
 <body>
   <div id="canvasWrap">
-    <canvas id="canvas" ></canvas>
-    <canvas id="select" ></canvas>
-    <canvas id="preview"></canvas>
+    <canvas id="canvas"></canvas>
+    <canvas id="select"></canvas>
   </div>
   <nav id="navtable" class="navbar navbar-fixed-bottom">
+    <div id="previewdiv" class="subsubnav">
+      <canvas id="preview"></canvas>
+      -> preview ^
+    </div>
     <div id="subnav" style="display:none;"></div>
     <div id="templates" style="display:none;"></div>
     <!-- TODO Use handlebars template -->
-    <table>
-      <tr>
-        <td id="saveB" class="navcell">
-          <div><img class="but" src="emoji/1f4be.png" /></div>
-          save
-        </td>
-        <td id="measurementsB" class="navcell">
-          <div><img class="but" src="emoji/1f4d0.png" /></div>
-          sizes 
-        </td>
-        <td id="picB" class="navcell">
-          <div class="upload" class="but">
-            <input id="imageLoader" type="file" accept="image/*" value="">
-          </div>
-          upload
-        </td>
-        <td id="libsB" class="navcell">
-          <div><img class="but" src="emoji/3299-fe0f.png" /></div>
-          icon sets
-        </td>
-        <td id="iconifyB" class="navcell">
-          <div><img class="but" src="emoji/1f525.png" /></div>
-          iconify
-        </td>
-      <tr>
-    </table>
+    <div id="main-nav">
+      <table>
+        <tr>
+          <td id="saveB" class="navcell">
+            <div><img class="but" src="emoji/1f4be.png" /></div>
+            save
+          </td>
+          <td id="measurementsB" class="navcell">
+            <div><img class="but" src="emoji/1f4d0.png" /></div>
+            sizes 
+          </td>
+          <td id="picB" class="navcell">
+            <div class="upload" class="but">
+              <input id="imageLoader" type="file" accept="image/*" value="">
+            </div>
+            upload
+          </td>
+          <td id="libsB" class="navcell">
+            <div><img class="but" src="emoji/3299-fe0f.png" /></div>
+            icon sets
+          </td>
+          <td id="iconifyB" class="navcell">
+            <div><img class="but" src="emoji/1f525.png" /></div>
+            iconify
+          </td>
+        <tr>
+      </table>
+    </div>
   </nav>
   <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
   <script type="text/javascript" src="bower_components/underscore/underscore.js"></script>
