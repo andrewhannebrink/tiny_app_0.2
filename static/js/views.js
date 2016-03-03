@@ -68,7 +68,6 @@ app.views = function () {
     el: '#navtable',
     events: {
       'click .navcell': 'butClicked',
-      'click #saveB': 'save',
       'click #measurementsB': 'showMeasurements',
       'click #picB': 'pic',
       'change #imageLoader': 'upload',
@@ -78,11 +77,6 @@ app.views = function () {
     butClicked: function () {
       console.log('butClicked');
       $('.navcell').removeClass('navtable_sel');
-    },
-    save: function () {
-      $('#subnav').hide(); //TODO take out this line
-      // TODO populate sub nav with form
-      $('#saveB').addClass('navtable_sel');
     },
     showMeasurements: function () {
       populateSubNav('measurements');

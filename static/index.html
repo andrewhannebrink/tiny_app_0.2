@@ -12,28 +12,27 @@
 </head>
 
 <body>
+  <div id="previewWrap">
+    <canvas id="preview"></canvas>
+    <br>
+    <div class="subsubnav">
+      -> preview ^
+    </div>
+  </div>
   <div id="canvasWrap">
     <canvas id="canvas"></canvas>
     <canvas id="select"></canvas>
   </div>
   <nav id="navtable" class="navbar navbar-fixed-bottom">
-    <div id="previewdiv" class="subsubnav">
-      <canvas id="preview"></canvas>
-      -> preview ^
-    </div>
     <div id="subnav" style="display:none;"></div>
     <div id="templates" style="display:none;"></div>
     <!-- TODO Use handlebars template -->
     <div id="main-nav">
       <table>
         <tr>
-          <td id="saveB" class="navcell">
-            <div><img class="but" src="emoji/1f4be.png" /></div>
-            save
-          </td>
           <td id="measurementsB" class="navcell">
             <div><img class="but" src="emoji/1f4d0.png" /></div>
-            sizes 
+            size 
           </td>
           <td id="picB" class="navcell">
             <div class="upload" class="but">

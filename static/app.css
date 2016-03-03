@@ -37,6 +37,10 @@ div {
   z-index: 100;
   position: static;
 }
+#previewWrap {
+  font-family: monospace;
+  position: fixed;
+}
 #preview {
   width: 200px;
   height: 200px;
